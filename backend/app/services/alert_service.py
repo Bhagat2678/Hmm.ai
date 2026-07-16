@@ -1,7 +1,6 @@
-import uuid
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from app.crud.alert import get_alerts, acknowledge_alert, create_alert, get_alert
+from app.crud.alert import get_alerts, acknowledge_alert, create_alert
 from app.crud.audit import create_audit_entry
 from app.db.models import Alert
 

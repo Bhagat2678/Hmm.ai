@@ -1,5 +1,4 @@
-from typing import Optional
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 from pydantic import BaseModel
 from app.core.security import create_access_token
 

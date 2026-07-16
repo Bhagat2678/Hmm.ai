@@ -1,4 +1,3 @@
-import uuid
 from typing import Dict, List, Optional, Any
 from sqlalchemy.orm import Session
 from app.db.models import AuditLog

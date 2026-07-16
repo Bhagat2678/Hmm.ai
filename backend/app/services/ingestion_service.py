@@ -1,9 +1,8 @@
-import uuid
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.logging import logger
-from app.crud.document import update_document_status, get_document
+from app.crud.document import update_document_status
 from app.crud.audit import create_audit_entry
 
 # Try importing AI/ML interface gracefully

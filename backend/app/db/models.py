@@ -2,8 +2,6 @@ import uuid
 from datetime import datetime
 from typing import List, Optional
 from sqlalchemy import (
-    Column,
-    String,
     Text,
     Boolean,
     DateTime,

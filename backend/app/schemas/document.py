@@ -1,7 +1,5 @@
 from datetime import datetime
-from typing import Optional, List
-import uuid
-from pydantic import BaseModel, Field, ConfigDict, model_validator
+from pydantic import BaseModel, ConfigDict, model_validator
 
 
 class DocumentSchema(BaseModel):
