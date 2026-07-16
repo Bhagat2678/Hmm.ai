@@ -12,3 +12,5 @@ langgraph
 google-genai
 apscheduler
 pytest
+pytest-asyncio
+python-multipart

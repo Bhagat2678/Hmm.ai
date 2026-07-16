@@ -8,12 +8,69 @@ from sqlalchemy import (
     Boolean,
     DateTime,
     ForeignKey,
+    JSON,
     func
 )
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID, ARRAY as PG_ARRAY, JSONB as PG_JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
 from app.db.base import Base
+
+from sqlalchemy.types import TypeDecorator, CHAR
+
+class GUID(TypeDecorator):
+    impl = CHAR
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PG_UUID(as_uuid=True))
+        else:
+            return dialect.type_descriptor(CHAR(36))
+
+    def process_bind_param(self, value, dialect):
+        if value is None:
+            return value
+        if isinstance(value, uuid.UUID):
+            return str(value)
+        return str(uuid.UUID(str(value)))
+
+    def process_result_value(self, value, dialect):
+        if value is None:
+            return value
+        if not isinstance(value, uuid.UUID):
+            return uuid.UUID(str(value))
+        return value
+
+
+class ArrayJSON(TypeDecorator):
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PG_ARRAY(Text))
+        else:
+            return dialect.type_descriptor(JSON)
+
+
+class JSONBJSON(TypeDecorator):
+    impl = JSON
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect):
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PG_JSONB())
+        else:
+            return dialect.type_descriptor(JSON)
+
+
+UUIDType = GUID()
+ArrayType = ArrayJSON()
+JSONType = JSONBJSON()
+VectorType = Vector(384).with_variant(JSON, "sqlite")
+
+
 
 
 class Document(Base):
@@ -24,7 +81,7 @@ class Document(Base):
     __tablename__ = "documents"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        UUIDType, primary_key=True, default=uuid.uuid4
     )
     filename: Mapped[str] = mapped_column(Text, nullable=False)
     document_type: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -34,7 +91,7 @@ class Document(Base):
     )
     status: Mapped[str] = mapped_column(Text, default="pending", nullable=False)
     graph_node_ids: Mapped[Optional[List[str]]] = mapped_column(
-        ARRAY(Text), nullable=True
+        ArrayType, nullable=True
     )
 
     chunks: Mapped[List["DocumentChunk"]] = relationship(
@@ -46,13 +103,13 @@ class DocumentChunk(Base):
     __tablename__ = "document_chunks"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        UUIDType, primary_key=True, default=uuid.uuid4
     )
     document_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False
+        UUIDType, ForeignKey("documents.id", ondelete="CASCADE"), nullable=False
     )
     chunk_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    embedding: Mapped[Optional[Vector]] = mapped_column(Vector(384), nullable=True)
+    embedding: Mapped[Optional[Vector]] = mapped_column(VectorType, nullable=True)
 
     document: Mapped["Document"] = relationship("Document", back_populates="chunks")
 
@@ -61,12 +118,12 @@ class Alert(Base):
     __tablename__ = "alerts"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        UUIDType, primary_key=True, default=uuid.uuid4
     )
     title: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     related_equipment_tags: Mapped[Optional[List[str]]] = mapped_column(
-        ARRAY(Text), nullable=True
+        ArrayType, nullable=True
     )
     severity: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # low | medium | high
     created_at: Mapped[datetime] = mapped_column(
@@ -79,12 +136,13 @@ class AuditLog(Base):
     __tablename__ = "audit_log"
 
     id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+        UUIDType, primary_key=True, default=uuid.uuid4
     )
     action: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     actor: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    details: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    details: Mapped[Optional[dict]] = mapped_column(JSONType, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
 
