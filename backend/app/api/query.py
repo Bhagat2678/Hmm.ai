@@ -14,7 +14,7 @@ def execute_query(
 ):
     if not request.query or not request.query.strip():
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=422,
             detail="The provided query string was empty.",
         )
 
@@ -27,9 +27,10 @@ def execute_query(
         return response
     except ValueError as ve:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=422,
             detail=str(ve),
         )
     except Exception as e:
         raise e
+
 

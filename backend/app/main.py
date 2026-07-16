@@ -95,7 +95,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        status_code=422,
         content={
             "error": {
                 "code": "INVALID_INPUT",
@@ -104,6 +104,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             }
         },
     )
+
 
 
 @app.exception_handler(ValueError)
