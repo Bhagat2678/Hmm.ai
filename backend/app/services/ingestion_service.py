@@ -31,16 +31,14 @@ def process_ingestion(
     update_document_status(db, document_id, status="processing")
 
     try:
-        if settings.MOCK_AI_ML or not callable(ingest_document):
-            logger.info("Using mock/stub ingestion mode")
-            res = {
-                "status": "success",
-                "document_id": document_id,
-                "entities_extracted": 4,
-                "graph_node_ids": ["node-p101", "node-v202"],
-            }
-        else:
-            res = ingest_document(file_content, meta)
+        if not callable(ingest_document):
+            raise RuntimeError(
+                "ai_ml.interfaces.ingest_document is not available. "
+                "Ensure the ai_ml module is installed and all dependencies are met. "
+                "Mock/stub ingestion is disabled."
+            )
+
+        res = ingest_document(file_content, meta)
 
         graph_nodes = res.get("graph_node_ids") if isinstance(res, dict) else None
         if not graph_nodes and isinstance(res, dict) and "entities_extracted" in res:

@@ -1,18 +1,18 @@
 FROM node:20-alpine
 
-# Set non-root user context for security (node user is pre-created in the image)
-USER node
-
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# The following lines are commented out as placeholders, 
-# but they represent the correct best-practice order for layer caching:
-# COPY --chown=node:node package*.json ./
-# RUN npm ci
+# Copy package files and install dependencies
+COPY package*.json ./
+RUN npm install
 
-# Copy the rest of the application code
-# COPY --chown=node:node . .
+# Copy application code
+COPY . .
+
+# Set permissions for node user
+RUN chown -R node:node /app
+USER node
 
 # Expose the Vite dev server port
 EXPOSE 5173

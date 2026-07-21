@@ -128,6 +128,7 @@ class Alert(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
     acknowledged: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    escalated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
 
 class AuditLog(Base):

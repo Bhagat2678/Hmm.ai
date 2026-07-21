@@ -19,6 +19,17 @@ def acknowledge_alert_service(alert_id: str, db: Session) -> Optional[Alert]:
         )
     return alert
 
+def escalate_alert_service(alert_id: str, db: Session) -> Optional[Alert]:
+    from app.crud.alert import escalate_alert
+    alert = escalate_alert(db, alert_id)
+    if alert:
+        create_audit_entry(
+            db,
+            action="alert_escalated",
+            details={"alert_id": str(alert.id), "title": alert.title},
+        )
+    return alert
+
 
 def create_alert_service(
     db: Session,

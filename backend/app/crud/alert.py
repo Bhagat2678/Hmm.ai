@@ -46,3 +46,13 @@ def acknowledge_alert(db: Session, alert_id: str | uuid.UUID) -> Optional[Alert]
     db.refresh(alert)
     return alert
 
+def escalate_alert(db: Session, alert_id: str | uuid.UUID) -> Optional[Alert]:
+    alert = get_alert(db, alert_id)
+    if not alert:
+        return None
+    alert.escalated = True
+    alert.severity = "high"
+    db.commit()
+    db.refresh(alert)
+    return alert
+

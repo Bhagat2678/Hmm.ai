@@ -14,3 +14,5 @@ apscheduler
 pytest
 pytest-asyncio
 python-multipart
+pyjwt
+

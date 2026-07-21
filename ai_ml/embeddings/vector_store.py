@@ -60,7 +60,7 @@ class VectorStore:
                         str_vec = "[" + ",".join(str(f) for f in vec) + "]"
                         query = text("""
                             INSERT INTO document_chunks (document_id, chunk_text, embedding)
-                            VALUES (:doc_id, :text, :embedding::vector)
+                            VALUES (:doc_id, :text, CAST(:embedding AS vector))
                         """)
                         conn.execute(query, {
                             "doc_id": chunk.get("document_id"),
@@ -85,21 +85,34 @@ class VectorStore:
             added_count += 1
         return added_count
 
-    def similarity_search(self, query_text: str, top_k: int = 5) -> List[Dict[str, Any]]:
-        """Performs vector similarity search against query vector."""
+    def similarity_search(self, query_text: str, top_k: int = 5, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """Performs vector similarity search against query vector with optional filtering."""
         query_vec = embedding_model.embed_text(query_text)
+        filters = filters or {}
+        doc_id_filter = filters.get("document_id")
 
         if self.engine:
             try:
                 str_vec = "[" + ",".join(str(f) for f in query_vec) + "]"
                 with self.engine.connect() as conn:
-                    query = text("""
-                        SELECT id, document_id, chunk_text, 1 - (embedding <=> :query_vec::vector) as similarity
-                        FROM document_chunks
-                        ORDER BY embedding <=> :query_vec::vector ASC
-                        LIMIT :top_k
-                    """)
-                    res = conn.execute(query, {"query_vec": str_vec, "top_k": top_k})
+                    if doc_id_filter:
+                        query = text("""
+                            SELECT id, document_id, chunk_text, 1 - (embedding <=> CAST(:query_vec AS vector)) as similarity
+                            FROM document_chunks
+                            WHERE document_id = CAST(:doc_id AS UUID)
+                            ORDER BY embedding <=> CAST(:query_vec AS vector) ASC
+                            LIMIT :top_k
+                        """)
+                        res = conn.execute(query, {"query_vec": str_vec, "top_k": top_k, "doc_id": doc_id_filter})
+                    else:
+                        query = text("""
+                            SELECT id, document_id, chunk_text, 1 - (embedding <=> CAST(:query_vec AS vector)) as similarity
+                            FROM document_chunks
+                            ORDER BY embedding <=> CAST(:query_vec AS vector) ASC
+                            LIMIT :top_k
+                        """)
+                        res = conn.execute(query, {"query_vec": str_vec, "top_k": top_k})
+                    
                     results = []
                     for row in res:
                         results.append({
@@ -122,6 +135,9 @@ class VectorStore:
 
         scored = []
         for item in self.memory_store:
+            if doc_id_filter and item.get("document_id") != doc_id_filter:
+                continue
+                
             vec = item["embedding"]
             v_norm = np.linalg.norm(vec)
             sim = 0.0

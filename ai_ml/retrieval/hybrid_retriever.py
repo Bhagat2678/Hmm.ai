@@ -22,7 +22,7 @@ class HybridRetriever:
         filters = filters or {}
         
         # 1. Fetch from individual paths
-        v_results = vector_search.search(query_text, top_k=TOP_K_HYBRID_RESULTS)
+        v_results = vector_search.search(query_text, top_k=TOP_K_HYBRID_RESULTS, filters=filters)
         g_results = graph_search.search(query_text, depth=1)
         k_results = keyword_search.search(query_text)
 

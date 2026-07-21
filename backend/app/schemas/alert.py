@@ -8,6 +8,7 @@ class AlertSchema(BaseModel):
     message: str
     created_at: datetime
     acknowledged: bool
+    escalated: bool
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
@@ -22,15 +23,21 @@ class AlertSchema(BaseModel):
                 "message": msg,
                 "created_at": data.created_at,
                 "acknowledged": data.acknowledged,
+                "escalated": getattr(data, "escalated", False),
             }
         elif isinstance(data, dict):
             if "description" in data and "message" not in data:
                 data["message"] = data["description"] or data.get("title", "")
             if "id" in data and not isinstance(data["id"], str):
                 data["id"] = str(data["id"])
+            if "escalated" not in data:
+                data["escalated"] = False
         return data
 
 
 class AlertAcknowledgeResponse(BaseModel):
     status: str = "acknowledged"
+
+class AlertEscalateResponse(BaseModel):
+    status: str = "escalated"
 

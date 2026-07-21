@@ -10,7 +10,7 @@ from app.db.base import Base
 from app.db.session import engine
 from app.services.scheduler import start_scheduler, stop_scheduler
 
-from app.api import documents, query, graph, alerts, auth
+from app.api import documents, query, graph, alerts, auth, stats
 
 
 @asynccontextmanager
@@ -170,6 +170,7 @@ app.include_router(query.router, prefix=settings.API_V1_STR)
 app.include_router(graph.router, prefix=settings.API_V1_STR)
 app.include_router(alerts.router, prefix=settings.API_V1_STR)
 app.include_router(auth.router, prefix=settings.API_V1_STR)
+app.include_router(stats.router, prefix=settings.API_V1_STR)
 
 
 @app.get("/health")

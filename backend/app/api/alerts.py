@@ -2,8 +2,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.schemas.alert import AlertSchema, AlertAcknowledgeResponse
-from app.services.alert_service import list_all_alerts, acknowledge_alert_service
+from app.schemas.alert import AlertSchema, AlertAcknowledgeResponse, AlertEscalateResponse
+from app.services.alert_service import list_all_alerts, acknowledge_alert_service, escalate_alert_service
 
 router = APIRouter(prefix="/alerts", tags=["alerts"])
 
@@ -24,4 +24,15 @@ def acknowledge_alert_endpoint(id: str, db: Session = Depends(get_db)):
             detail=f"Alert with id '{id}' not found.",
         )
     return AlertAcknowledgeResponse(status="acknowledged")
+
+
+@router.post("/{id}/escalate", response_model=AlertEscalateResponse, status_code=status.HTTP_200_OK)
+def escalate_alert_endpoint(id: str, db: Session = Depends(get_db)):
+    alert = escalate_alert_service(id, db)
+    if not alert:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Alert with id '{id}' not found.",
+        )
+    return AlertEscalateResponse(status="escalated")
 

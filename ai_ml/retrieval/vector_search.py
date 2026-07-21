@@ -9,11 +9,11 @@ from ai_ml.config.constants import TOP_K_VECTOR_RESULTS
 
 class VectorSearch:
 
-    def search(self, query_text: str, top_k: int = TOP_K_VECTOR_RESULTS) -> List[Dict[str, Any]]:
+    def search(self, query_text: str, top_k: int = TOP_K_VECTOR_RESULTS, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
         """
         Executes vector similarity search against pgvector / memory store.
         """
-        raw_results = vector_store.similarity_search(query_text, top_k=top_k)
+        raw_results = vector_store.similarity_search(query_text, top_k=top_k, filters=filters)
         results = []
         for r in raw_results:
             results.append({

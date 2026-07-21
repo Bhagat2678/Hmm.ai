@@ -23,27 +23,17 @@ def query_knowledge_base(
     logger.info(f"Executing query: '{query_text}' with filters: {filters}")
 
     result_data = None
-    if not settings.MOCK_AI_ML and callable(query_knowledge):
+    if callable(query_knowledge):
         try:
             result_data = query_knowledge(query_text, filters)
         except Exception as e:
-            logger.warning(f"AI/ML query_knowledge failed, falling back to mock: {e}")
+            logger.error(f"AI/ML query_knowledge failed: {e}", exc_info=True)
             raise e
+    else:
+        raise RuntimeError("AI/ML module query_knowledge is not available or not callable. Check ai_ml directory mounts and imports.")
 
     if not result_data:
-        # Fallback to realistic mock response
-        result_data = {
-            "answer": (
-                f"Analysis for '{query_text}': Primary operational records indicate that "
-                "valve leakage is typically caused by degraded seal gaskets during high-pressure thermal cycles. "
-                "Recommended maintenance procedure includes replacing ring seals every 6 months."
-            ),
-            "sources": [
-                {"doc_id": "doc-101", "title": "Pump Maintenance Protocol.pdf"},
-                {"doc_id": "doc-102", "title": "Valve Inspection Manual v2.pdf"},
-            ],
-            "confidence": 0.91,
-        }
+        raise RuntimeError("AI/ML module returned empty response.")
 
     sources = [
         QuerySource(doc_id=s.get("doc_id", "unknown"), title=s.get("title", "Unknown Source"))
