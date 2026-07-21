@@ -11,13 +11,13 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-from app.core.config import settings
-from app.core.logging import logger
-from app.db.base import Base
-from app.db.session import engine
-from app.services.scheduler import start_scheduler, stop_scheduler
+from app.core.config import settings  # noqa: E402
+from app.core.logging import logger  # noqa: E402
+from app.db.base import Base  # noqa: E402
+from app.db.session import engine  # noqa: E402
+from app.services.scheduler import start_scheduler, stop_scheduler  # noqa: E402
 
-from app.api import documents, query, graph, alerts, auth, stats
+from app.api import documents, query, graph, alerts, auth, stats  # noqa: E402
 
 
 
@@ -184,4 +184,3 @@ app.include_router(stats.router, prefix=settings.API_V1_STR)
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
-

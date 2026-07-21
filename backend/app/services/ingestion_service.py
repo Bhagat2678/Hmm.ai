@@ -1,7 +1,5 @@
 from typing import Dict, Any, Optional
-from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
-from app.core.config import settings
 from app.core.logging import logger
 from app.crud.document import update_document_status
 from app.crud.audit import create_audit_entry

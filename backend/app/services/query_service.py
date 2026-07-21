@@ -1,6 +1,5 @@
 from typing import Dict, Any
 from sqlalchemy.orm import Session
-from app.core.config import settings
 from app.core.logging import logger
 from app.crud.audit import create_audit_entry
 from app.schemas.query import QueryResponse, QuerySource
@@ -57,4 +56,3 @@ def query_knowledge_base(
     )
 
     return response
-

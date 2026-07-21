@@ -1,8 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, status
-from app.core.config import settings
 from app.core.logging import logger
-from app.schemas.graph import GraphNode, GraphEdge, GraphNeighborhoodResponse
+from app.schemas.graph import GraphNeighborhoodResponse
 
 try:
     from ai_ml.interfaces import get_graph_neighborhood
@@ -44,4 +43,3 @@ def fetch_graph_neighborhood(
             logger.error(f"Error querying graph neighborhood for '{target_id}': {e}")
 
     return GraphNeighborhoodResponse(nodes=[], edges=[])
-
