@@ -59,7 +59,12 @@ def get_platform_stats(db: Session = Depends(get_db)):
     # Get graph stats from ai_ml module if available
     try:
         from ai_ml.graph.neo4j_client import neo4j_client
-        if neo4j_client.memory_graph is not None:
+        if neo4j_client.driver:
+            records = neo4j_client.run_query("MATCH (n) OPTIONAL MATCH (n)-[r]->(m) RETURN count(distinct n) AS nodes, count(distinct r) AS rels")
+            if records:
+                stats["graph_nodes"] = records[0].get("nodes", 0)
+                stats["graph_edges"] = records[0].get("rels", 0)
+        elif neo4j_client.memory_graph is not None:
             stats["graph_nodes"] = neo4j_client.memory_graph.number_of_nodes()
             stats["graph_edges"] = neo4j_client.memory_graph.number_of_edges()
 

@@ -162,7 +162,6 @@ function UploadPage() {
                 className="hidden"
                 ref={fileInputRef}
                 onChange={handleFileChange}
-                onClick={(e) => e.stopPropagation()}
               />
               <button
                 type="button"
@@ -358,7 +357,7 @@ function UploadPage() {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs font-bold text-foreground">{h.filename}</p>
                 <p className="text-[11px] font-medium text-muted-foreground">
-                  Ingested {new Date(h.created_at).toLocaleDateString()} · Fully indexed & linked
+                  Ingested {new Date(h.created_at || h.upload_date || Date.now()).toLocaleDateString()} · Fully indexed & linked
                 </p>
               </div>
               <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-200">

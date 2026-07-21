@@ -76,10 +76,10 @@ export const queryService = {
 };
 
 export const graphService = {
-  getNeighborhood: async (entityId: string, depth: number = 1): Promise<GraphData> => {
-    const response = await api.get('/graph/neighborhood', {
-      params: { entity_id: entityId, depth },
-    });
+  getNeighborhood: async (entityId?: string, depth: number = 1): Promise<GraphData> => {
+    const params: Record<string, any> = { depth };
+    if (entityId) params.entity_id = entityId;
+    const response = await api.get('/graph/neighborhood', { params });
     return response.data;
   },
 };

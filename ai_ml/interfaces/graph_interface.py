@@ -8,25 +8,14 @@ from ai_ml.agents.failure_intelligence_agent import failure_scan_agent_executor
 from ai_ml.utils.logger import logger
 
 
-def get_graph_neighborhood(entity_id: str, depth: int = 1) -> Dict[str, Any]:
+def get_graph_neighborhood(entity_id: Optional[str] = "", depth: int = 1) -> Dict[str, Any]:
     """
     Fetches the sub-graph surrounding entity_id up to specified depth.
-
-    Inputs:
-        entity_id: Unique tag/ID of entity.
-        depth: Traversal depth (default: 1).
-
-    Outputs:
-        { "nodes": [...], "edges": [...] }
-
-    Raises:
-        KeyError: If entity_id is missing or invalid.
+    If entity_id is empty or 'ALL', retrieves all graph nodes and edges.
     """
-    if not entity_id:
-        raise KeyError("Invalid entity_id: entity_id cannot be empty.")
-
+    target = entity_id if entity_id is not None else ""
     try:
-        return neo4j_client.get_neighborhood(entity_id, depth=depth)
+        return neo4j_client.get_neighborhood(target, depth=depth)
     except Exception as e:
         logger.error(f"Failed fetching graph neighborhood for '{entity_id}': {e}")
         raise RuntimeError(f"Graph neighborhood error: {e}") from e

@@ -59,10 +59,14 @@ interface NavListProps {
   onNavigate?: () => void;
 }
 
+import { useAlerts } from "@/hooks/useAlerts";
+
 export function NavList({ collapsed = false, onNavigate }: NavListProps) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const { data: alerts } = useAlerts();
+  const unackAlertsCount = alerts?.filter((a: any) => !a.acknowledged).length || 0;
 
   return (
     <div className="flex flex-col h-full justify-between">
@@ -72,7 +76,7 @@ export function NavList({ collapsed = false, onNavigate }: NavListProps) {
           <div className="px-3 pt-2">
             <button
               onClick={() => {
-                navigate({ to: "/query" });
+                navigate({ to: "/query", search: { reset: Date.now().toString() } });
                 onNavigate?.();
               }}
               className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-xs font-bold text-white shadow-md shadow-primary/25 hover:brightness-110 active:scale-98 transition-all cursor-pointer"
@@ -89,6 +93,7 @@ export function NavList({ collapsed = false, onNavigate }: NavListProps) {
               ? pathname === item.to
               : pathname === item.to || pathname.startsWith(`${item.to}/`);
             const Icon = item.icon;
+            const badgeValue = item.to === "/alerts" ? (unackAlertsCount > 0 ? unackAlertsCount.toString() : undefined) : item.badge;
             return (
               <Link
                 key={item.to}
@@ -115,14 +120,14 @@ export function NavList({ collapsed = false, onNavigate }: NavListProps) {
                 {!collapsed && (
                   <>
                     <span className="truncate">{item.title}</span>
-                    {item.badge && (
+                    {badgeValue && (
                       <span
                         className={cn(
                           "ml-auto rounded-full px-2 py-0.5 text-[10px] font-bold",
                           active ? "bg-white/20 text-white" : "bg-amber-100 text-amber-700",
                         )}
                       >
-                        {item.badge}
+                        {badgeValue}
                       </span>
                     )}
                   </>

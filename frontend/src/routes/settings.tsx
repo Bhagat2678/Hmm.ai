@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Badge,
   Palette,
@@ -12,11 +12,7 @@ import {
   HelpCircle,
   LogOut,
   Sparkles,
-  Sun,
-  Moon,
-  Laptop,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -35,26 +31,78 @@ export const Route = createFileRoute("/settings")({
 
 function SettingsPage() {
   const { logout } = useAuth();
-  const [fullName, setFullName] = useState("Julianna Vesper");
-  const [handle, setHandle] = useState("julianna_ai");
-  const [bio, setBio] = useState(
-    "Product Designer & AI Ethicist. Building the future of industrial productivity tools with Mhmm.ai.",
-  );
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
-  const [clarityThreshold, setClarityThreshold] = useState("85");
-  const [emailAlerts, setEmailAlerts] = useState(true);
-  const [vibrationAlerts, setVibrationAlerts] = useState(true);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState(() => {
+    return (
+      localStorage.getItem("mhmm-avatarUrl") ||
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60"
+    );
+  });
+  const [fullName, setFullName] = useState(() => {
+    return localStorage.getItem("mhmm-fullName") || "Operator";
+  });
+  const [handle, setHandle] = useState(() => {
+    return localStorage.getItem("mhmm-handle") || "operator_eng";
+  });
+  const [bio, setBio] = useState(() => {
+    return (
+      localStorage.getItem("mhmm-bio") ||
+      "Reliability Engineer & Operator on Unit 300 Refinery Operations."
+    );
+  });
+
+  const [clarityThreshold, setClarityThreshold] = useState(() => {
+    return localStorage.getItem("mhmm-clarityThreshold") || "85";
+  });
+  const [emailAlerts, setEmailAlerts] = useState(() => {
+    const val = localStorage.getItem("mhmm-emailAlerts");
+    return val !== null ? JSON.parse(val) : true;
+  });
+  const [vibrationAlerts, setVibrationAlerts] = useState(() => {
+    const val = localStorage.getItem("mhmm-vibrationAlerts");
+    return val !== null ? JSON.parse(val) : true;
+  });
   const [isSaved, setIsSaved] = useState(false);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarUrl(reader.result as string);
+        toast.success("Avatar image updated!");
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    localStorage.setItem("mhmm-fullName", fullName);
+    localStorage.setItem("mhmm-handle", handle);
+    localStorage.setItem("mhmm-bio", bio);
+    localStorage.setItem("mhmm-clarityThreshold", clarityThreshold);
+    localStorage.setItem("mhmm-emailAlerts", JSON.stringify(emailAlerts));
+    localStorage.setItem("mhmm-vibrationAlerts", JSON.stringify(vibrationAlerts));
+    localStorage.setItem("mhmm-avatarUrl", avatarUrl);
+
     setIsSaved(true);
-    toast.success("Workspace settings updated");
+    toast.success("Workspace settings saved successfully");
+    window.dispatchEvent(new Event("mhmm-settings-update"));
     setTimeout(() => setIsSaved(false), 2000);
   };
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-24">
+      {/* Hidden Avatar File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept="image/*"
+        onChange={handleAvatarChange}
+        className="hidden"
+      />
+
       {/* 1:1 Stitch Settings Header */}
       <header className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -76,11 +124,15 @@ function SettingsPage() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
             {/* Avatar Column */}
             <div className="col-span-1 flex flex-col items-center gap-3">
-              <div className="relative group cursor-pointer">
+              <div
+                onClick={() => fileInputRef.current?.click()}
+                className="relative group cursor-pointer"
+                title="Click to change avatar"
+              >
                 <div className="w-32 h-32 rounded-full border-4 border-primary/20 overflow-hidden bg-primary/10 flex items-center justify-center shadow-md">
                   <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60"
-                    alt="Julianna Vesper Profile Avatar"
+                    src={avatarUrl}
+                    alt="Operator Profile Avatar"
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -88,7 +140,10 @@ function SettingsPage() {
                   <Camera className="h-6 w-6" />
                 </div>
               </div>
-              <p className="text-xs font-bold text-primary cursor-pointer hover:underline">
+              <p
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs font-bold text-primary cursor-pointer hover:underline"
+              >
                 Change Avatar
               </p>
             </div>
@@ -135,67 +190,29 @@ function SettingsPage() {
           </div>
         </section>
 
-        {/* Appearance Section (1:1 Stitch) */}
+        {/* Appearance Section */}
         <section className="glass-panel p-8 rounded-3xl space-y-6">
           <div className="flex items-center gap-3 border-b border-border/50 pb-4">
             <Palette className="h-6 w-6 text-primary" />
             <h2 className="text-lg font-bold text-foreground">Appearance</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="space-y-3">
-              <label className="text-xs font-bold text-foreground block">System Theme</label>
-              <div className="flex bg-primary/10 p-1 rounded-2xl">
-                <button
-                  type="button"
-                  onClick={() => setTheme("light")}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer",
-                    theme === "light" ? "bg-white text-primary shadow-xs" : "text-muted-foreground",
-                  )}
-                >
-                  <Sun className="h-4 w-4" /> Light
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTheme("dark")}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer",
-                    theme === "dark" ? "bg-white text-primary shadow-xs" : "text-muted-foreground",
-                  )}
-                >
-                  <Moon className="h-4 w-4" /> Dark
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTheme("system")}
-                  className={cn(
-                    "flex-1 py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer",
-                    theme === "system" ? "bg-white text-primary shadow-xs" : "text-muted-foreground",
-                  )}
-                >
-                  <Laptop className="h-4 w-4" /> Auto
-                </button>
-              </div>
+          <div className="max-w-xl space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-foreground">Clarity Threshold %</label>
+              <span className="font-mono text-xs font-bold text-primary">{clarityThreshold}%</span>
             </div>
-
-            <div className="space-y-3 md:col-span-2">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-foreground">Clarity Threshold %</label>
-                <span className="font-mono text-xs font-bold text-primary">{clarityThreshold}%</span>
-              </div>
-              <input
-                type="range"
-                min="50"
-                max="99"
-                value={clarityThreshold}
-                onChange={(e) => setClarityThreshold(e.target.value)}
-                className="w-full accent-primary cursor-pointer"
-              />
-              <p className="text-[11px] text-muted-foreground">
-                Sets context retention sensitivity for vector searches and knowledge retrieval.
-              </p>
-            </div>
+            <input
+              type="range"
+              min="50"
+              max="99"
+              value={clarityThreshold}
+              onChange={(e) => setClarityThreshold(e.target.value)}
+              className="w-full accent-primary cursor-pointer"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Sets context retention sensitivity for vector searches and knowledge retrieval.
+            </p>
           </div>
         </section>
 

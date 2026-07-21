@@ -60,17 +60,89 @@ class Neo4jClient:
         Returns `{ "nodes": [...], "edges": [...] }` conforming to Section 7 Integration Contract.
         """
         if self.driver:
-            cypher = """
-            MATCH (start {id: $entity_id})
-            CALL apoc.path.subgraphAll(start, {maxLevel: $depth})
-            YIELD nodes, relationships
-            RETURN nodes, relationships
-            """
-            # Fallback simple MATCH if APOC not enabled on free tier
+            if not entity_id or entity_id == "ALL":
+                cypher = """
+                MATCH (n)
+                OPTIONAL MATCH (n)-[r]->(m)
+                RETURN n, r, m
+                """
+                try:
+                    records = self.run_query(cypher)
+                    nodes_dict = {}
+                    edges_dict = {}
+
+                    for rec in records:
+                        n = rec.get("n")
+                        r = rec.get("r")
+                        m = rec.get("m")
+
+                        for item in (n, m):
+                            if item:
+                                props = dict(item) if hasattr(item, "items") else (item if isinstance(item, dict) else {})
+                                n_id = props.get("id") or props.get("filename") or props.get("name") or props.get("tag")
+                                if n_id:
+                                    # Infer label
+                                    if "tag" in props or (props.get("name") and any(props["name"].startswith(p) for p in ("PUMP", "P-", "V-", "TT-", "FT-", "HX-"))):
+                                        n_label = "Equipment"
+                                    elif "filename" in props or "document_type" in props:
+                                        n_label = "Document"
+                                    elif hasattr(item, "labels") and item.labels:
+                                        n_label = list(item.labels)[0]
+                                    else:
+                                        n_label = "Entity"
+
+                                    nodes_dict[str(n_id)] = {
+                                        "id": str(n_id),
+                                        "label": n_label,
+                                        "properties": props,
+                                    }
+
+                        if r:
+                            src_id = None
+                            tgt_id = None
+                            rel_type = "LINKED_TO"
+
+                            if isinstance(r, tuple) and len(r) == 3:
+                                s_dict, rel_type_val, t_dict = r
+                                rel_type = str(rel_type_val)
+                                if isinstance(s_dict, dict):
+                                    src_id = s_dict.get("id") or s_dict.get("filename") or s_dict.get("name")
+                                if isinstance(t_dict, dict):
+                                    tgt_id = t_dict.get("id") or t_dict.get("filename") or t_dict.get("name")
+                            elif hasattr(r, "type"):
+                                rel_type = r.type
+                                if hasattr(r, "start_node") and hasattr(r, "end_node"):
+                                    src_id = r.start_node.get("id") or r.start_node.get("name")
+                                    tgt_id = r.end_node.get("id") or r.end_node.get("name")
+
+                            if src_id and tgt_id:
+                                r_id = f"{src_id}-{rel_type}-{tgt_id}"
+                                edges_dict[str(r_id)] = {
+                                    "id": str(r_id),
+                                    "source": str(src_id),
+                                    "target": str(tgt_id),
+                                    "type": rel_type,
+                                }
+
+                    if nodes_dict:
+                        return {
+                            "nodes": list(nodes_dict.values()),
+                            "edges": list(edges_dict.values()),
+                        }
+                except Exception as e:
+                    logger.warning(f"Neo4j all nodes query failed: {e}")
+
             simple_cypher = """
-            MATCH (start) WHERE start.id = $entity_id OR start.name = $entity_id OR start.tag = $entity_id
-            MATCH path = (start)-[*1..%d]-(neighbor)
-            RETURN nodes(path) AS nodes, relationships(path) AS rels
+            MATCH (start) 
+            WHERE start.id = $entity_id 
+               OR start.name = $entity_id 
+               OR start.filename = $entity_id 
+               OR start.tag = $entity_id
+               OR toLower(start.id) = toLower($entity_id)
+               OR toLower(start.filename) = toLower($entity_id)
+               OR toLower(start.name) = toLower($entity_id)
+            OPTIONAL MATCH path = (start)-[*1..%d]-(neighbor)
+            RETURN start, nodes(path) AS nodes, relationships(path) AS rels
             """ % depth
 
             try:
@@ -79,33 +151,48 @@ class Neo4jClient:
                 edges_dict = {}
 
                 for rec in records:
-                    raw_nodes = rec.get("nodes", [])
-                    raw_rels = rec.get("rels", [])
+                    start_node = rec.get("start")
+                    if start_node:
+                        s_props = dict(start_node) if hasattr(start_node, "items") else (start_node if isinstance(start_node, dict) else {})
+                        s_id = s_props.get("id") or s_props.get("filename") or s_props.get("name") or s_props.get("tag")
+                        if s_id:
+                            s_label = list(start_node.labels)[0] if hasattr(start_node, "labels") and start_node.labels else ("Document" if "filename" in s_props else "Equipment")
+                            nodes_dict[str(s_id)] = {
+                                "id": str(s_id),
+                                "label": s_label,
+                                "properties": s_props,
+                            }
+
+                    raw_nodes = rec.get("nodes") or []
+                    raw_rels = rec.get("rels") or []
 
                     for node in raw_nodes:
-                        n_id = node.get("id") or node.get("name") or node.get("tag")
-                        n_label = list(node.labels)[0] if hasattr(node, "labels") and node.labels else "Entity"
-                        n_props = dict(node)
+                        n_props = dict(node) if hasattr(node, "items") else (node if isinstance(node, dict) else {})
+                        n_id = n_props.get("id") or n_props.get("filename") or n_props.get("name") or n_props.get("tag")
+                        n_label = list(node.labels)[0] if hasattr(node, "labels") and node.labels else ("Document" if "filename" in n_props else "Entity")
                         if n_id:
                             nodes_dict[str(n_id)] = {
                                 "id": str(n_id),
                                 "label": n_label,
-                                "properties": n_props
+                                "properties": n_props,
                             }
 
                     for rel in raw_rels:
                         r_id = rel.id if hasattr(rel, "id") else f"{rel.start_node}-{rel.end_node}"
-                        edges_dict[str(r_id)] = {
-                            "id": str(r_id),
-                            "source": str(rel.start_node.get("id") or rel.start_node.get("name") or rel.start_node.get("tag")),
-                            "target": str(rel.end_node.get("id") or rel.end_node.get("name") or rel.end_node.get("tag")),
-                            "type": rel.type if hasattr(rel, "type") else "LINKED_TO"
-                        }
+                        s_id = rel.start_node.get("id") or rel.start_node.get("filename") or rel.start_node.get("name") or rel.start_node.get("tag")
+                        t_id = rel.end_node.get("id") or rel.end_node.get("filename") or rel.end_node.get("name") or rel.end_node.get("tag")
+                        if s_id and t_id:
+                            edges_dict[str(r_id)] = {
+                                "id": str(r_id),
+                                "source": str(s_id),
+                                "target": str(t_id),
+                                "type": rel.type if hasattr(rel, "type") else "LINKED_TO",
+                            }
 
                 if nodes_dict:
                     return {
                         "nodes": list(nodes_dict.values()),
-                        "edges": list(edges_dict.values())
+                        "edges": list(edges_dict.values()),
                     }
             except Exception as e:
                 logger.warning(f"Neo4j neighborhood traversal failed: {e}")
@@ -114,9 +201,9 @@ class Neo4jClient:
         return self._get_memory_neighborhood(entity_id, depth)
 
     def _get_memory_neighborhood(self, entity_id: str, depth: int) -> Dict[str, Any]:
-        if self.memory_graph is None or not self.memory_graph.has_node(entity_id):
+        if not entity_id or self.memory_graph is None or not self.memory_graph.has_node(entity_id):
             return {
-                "nodes": [{"id": entity_id, "label": "Equipment", "properties": {"name": entity_id}}],
+                "nodes": [],
                 "edges": []
             }
 

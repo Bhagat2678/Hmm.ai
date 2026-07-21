@@ -22,12 +22,14 @@ import {
   Activity,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { useKnowledgeQuery } from "../hooks/useKnowledgeQuery";
 
 export const Route = createFileRoute("/query")({
-  validateSearch: (search: Record<string, unknown>) => {
+  validateSearch: (search: Record<string, unknown>): { q?: string; reset?: string } => {
     return {
       q: search.q as string | undefined,
+      reset: search.reset as string | undefined,
     };
   },
   head: () => ({
@@ -52,7 +54,7 @@ const SUGGESTED = [
 ];
 
 function QueryPage() {
-  const { q: urlQuery } = Route.useSearch();
+  const { q: urlQuery, reset: urlReset } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const [input, setInput] = useState(urlQuery || "");
   const { mutate: submitQuery, isPending } = useKnowledgeQuery();
@@ -70,9 +72,18 @@ function QueryPage() {
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (urlReset) {
+      setConversation([]);
+      setActiveCitations([]);
+      setInput("");
+      navigate({ search: (prev) => ({ ...prev, reset: undefined }), replace: true });
+    }
+  }, [urlReset]);
+
+  useEffect(() => {
     if (urlQuery && conversation.length === 0 && !isPending) {
       send(urlQuery);
-      navigate({ search: {} });
+      navigate({ search: (prev) => ({ ...prev, q: undefined }) });
     }
   }, [urlQuery]);
 
@@ -203,12 +214,19 @@ function QueryPage() {
               <h2 className="text-sm font-bold text-foreground">Cosmic Knowledge Assistant</h2>
               <p className="text-[10px] font-bold text-muted-foreground inline-flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 live-dot" />
-                Gemini 1.5 · Active Session
+                Gemini 2.5 Flash · Groq RAG
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button className="p-2 rounded-xl text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer">
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success("Query link copied to clipboard");
+              }}
+              title="Share Query"
+              className="p-2 rounded-xl text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
+            >
               <Share2 className="h-4 w-4" />
             </button>
             <button

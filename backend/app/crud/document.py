@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 import uuid
 from typing import List, Optional
 from sqlalchemy.orm import Session
@@ -16,6 +17,7 @@ def create_document(
         document_type=document_type,
         uploaded_by=uploaded_by,
         status=status,
+        uploaded_at=datetime.now(timezone.utc),
     )
     db.add(doc)
     db.commit()

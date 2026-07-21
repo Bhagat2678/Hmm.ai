@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-iki}
     ports:
-      - "5433:5432"
+      - "5434:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -65,8 +65,8 @@ services:
     environment:
       - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000/api}
     ports:
-      - "5173:8080"
-      - "8080:8080"
+      - "5173:5173"
+      - "8080:5173"
     depends_on:
       backend:
         condition: service_healthy

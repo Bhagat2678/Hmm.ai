@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from typing import Dict, List, Optional, Any
 from sqlalchemy.orm import Session
 from app.db.models import AuditLog
@@ -13,6 +14,7 @@ def create_audit_entry(
         action=action,
         actor=actor or "system",
         details=details or {},
+        created_at=datetime.now(timezone.utc),
     )
     db.add(log_entry)
     db.commit()

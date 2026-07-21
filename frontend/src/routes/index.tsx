@@ -154,6 +154,7 @@ function DashboardPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               to="/query"
+              search={{ q: undefined }}
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary/25 hover:brightness-110 transition-all"
             >
               <Sparkles className="h-4 w-4" />
@@ -219,7 +220,7 @@ function DashboardPage() {
 
       {/* Graph Preview + Alerts */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <KnowledgeGraphPreview />
+        <KnowledgeGraphPreview stats={stats} />
         <AlertsPanel alerts={alerts || []} />
       </section>
 
@@ -616,8 +617,23 @@ function KnowledgeGraphPreview({ stats }: { stats?: any }) {
             </p>
           </div>
         ) : (
-          <div className="text-center p-6 text-xs text-muted-foreground">
-            {stats.graph_nodes} equipment and sensor nodes active in graph.
+          <div className="flex flex-col items-center justify-center p-6 space-y-4 text-center">
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <Network className="h-5 w-5" />
+              </span>
+              <div className="text-left">
+                <p className="text-sm font-bold text-foreground">{stats.graph_nodes} Active Graph Nodes</p>
+                <p className="text-xs text-muted-foreground">{stats.graph_edges || 0} Relationships mapped in Neo4j AuraDB</p>
+              </div>
+            </div>
+            <Link
+              to="/graph"
+              className="inline-flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/20 transition-all"
+            >
+              <GitBranch className="h-3.5 w-3.5" />
+              Explore Knowledge Graph Canvas
+            </Link>
           </div>
         )}
       </div>

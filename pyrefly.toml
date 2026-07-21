@@ -1,0 +1,17 @@
+# Pyrefly configuration for Mhmm.ai
+# Packages like sqlalchemy, fastapi, pydantic, pgvector are installed
+# inside Docker — not locally — so we suppress missing-import errors.
+
+project_includes = ["backend", "ai_ml"]
+
+project_excludes = [
+    ".venv",
+    "__pycache__",
+    ".ruff_cache",
+    "node_modules",
+    "frontend",
+    ".git",
+]
+
+[errors]
+missing-import = "ignore"

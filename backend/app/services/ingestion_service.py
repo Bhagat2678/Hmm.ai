@@ -1,4 +1,5 @@
 from typing import Dict, Any, Optional
+from sqlalchemy.orm import Session
 from app.db.session import SessionLocal
 from app.core.logging import logger
 from app.crud.document import update_document_status
@@ -16,7 +17,8 @@ def process_ingestion(
     file_content: bytes,
     filename: str,
     metadata: Optional[Dict[str, Any]] = None,
-) -> Dict[str, Any]:
+    db_session: Optional[Session] = None,
+) -> Optional[Dict[str, Any]]:
     """
     Orchestrates background document ingestion.
     Updates document status to 'processing' -> 'ingested' (or 'failed')
@@ -25,7 +27,15 @@ def process_ingestion(
     logger.info(f"Starting ingestion for document_id={document_id}, filename={filename}")
     meta = metadata or {"filename": filename, "document_id": document_id}
 
-    db = SessionLocal()
+    should_close = False
+    db = db_session
+    if db is None:
+        try:
+            db = SessionLocal()
+            should_close = True
+        except Exception as conn_err:
+            logger.warning(f"Could not open DB session for ingestion: {conn_err}")
+            return {"status": "skipped", "reason": str(conn_err)}
     try:
         # Update status to processing
         update_document_status(db, document_id, status="processing")
@@ -63,16 +73,20 @@ def process_ingestion(
 
     except Exception as e:
         logger.error(f"Ingestion failed for document_id={document_id}: {str(e)}")
-        update_document_status(db, document_id, status="failed")
-        create_audit_entry(
-            db,
-            action="document_ingestion_failure",
-            details={
-                "document_id": document_id,
-                "filename": filename,
-                "error": str(e),
-            },
-        )
-        raise e
+        try:
+            update_document_status(db, document_id, status="failed")
+            create_audit_entry(
+                db,
+                action="document_ingestion_failure",
+                details={
+                    "document_id": document_id,
+                    "filename": filename,
+                    "error": str(e),
+                },
+            )
+        except Exception as update_err:
+            logger.warning(f"Could not record ingestion failure in DB: {update_err}")
+        return {"status": "failed", "error": str(e)}
     finally:
-        db.close()
+        if should_close and db:
+            db.close()

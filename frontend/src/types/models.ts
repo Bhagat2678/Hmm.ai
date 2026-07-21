@@ -1,8 +1,9 @@
 export interface Document {
   id: string;
   filename: string;
-  upload_date: string;
-  status: 'processing' | 'completed' | 'failed';
+  upload_date?: string;
+  created_at?: string;
+  status: 'pending' | 'processing' | 'completed' | 'ingested' | 'failed';
 }
 
 export interface Alert {
@@ -33,6 +34,7 @@ export interface GraphData {
 
 export interface QueryRequest {
   query: string;
+  conversation_id?: string;
   filters?: Record<string, any>;
 }
 

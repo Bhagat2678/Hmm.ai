@@ -1,6 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import List, Optional
+# pyrefly: ignore [missing-import]
 from sqlalchemy import (
     Text,
     Boolean,
@@ -9,6 +10,7 @@ from sqlalchemy import (
     JSON,
     func
 )
+# pyrefly: ignore [missing-import]
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID, ARRAY as PG_ARRAY, JSONB as PG_JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pgvector.sqlalchemy import Vector
@@ -85,7 +87,7 @@ class Document(Base):
     document_type: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     uploaded_by: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), default=func.now(), nullable=False
     )
     status: Mapped[str] = mapped_column(Text, default="pending", nullable=False)
     graph_node_ids: Mapped[Optional[List[str]]] = mapped_column(
@@ -125,7 +127,7 @@ class Alert(Base):
     )
     severity: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # low | medium | high
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), default=func.now(), nullable=False
     )
     acknowledged: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     escalated: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -141,7 +143,7 @@ class AuditLog(Base):
     actor: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     details: Mapped[Optional[dict]] = mapped_column(JSONType, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True), server_default=func.now(), default=func.now(), nullable=False
     )
 
 

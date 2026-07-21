@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import {
   FileText,
@@ -69,6 +69,7 @@ const STATUS_STYLES: Record<string, string> = {
 const CATEGORIES = ["All", "P&ID", "SOP", "Manual", "Report", "Drawing", "HAZOP"] as const;
 
 function DocumentsPage() {
+  const navigate = useNavigate();
   const { data: apiDocs } = useDocuments();
   const { mutate: deleteDocument } = useDeleteDocument();
   const { mutate: downloadDocument } = useDownloadDocument();
@@ -92,13 +93,37 @@ function DocumentsPage() {
   }, [isPaused]);
 
   const filtered = displayDocs.filter((d: any) => {
-    const matchCategory = category === "All" || (d.category && d.category === category);
     const docName = (d.filename || d.name || "").toLowerCase();
+    const docType = (d.document_type || d.category || "").toLowerCase();
     const docEquip = (d.equipment || "").toLowerCase();
+
+    let matchCategory = category === "All";
+    if (!matchCategory) {
+      const catLower = category.toLowerCase();
+      if (catLower === "p&id") {
+        matchCategory =
+          docType.includes("pid") ||
+          docType.includes("p&id") ||
+          docType.includes("p_id") ||
+          docName.includes("pid") ||
+          docName.includes("p&id") ||
+          docName.includes("p_id") ||
+          docName.includes("diagram") ||
+          docName.includes("piping");
+      } else {
+        matchCategory =
+          docType === catLower ||
+          docType.includes(catLower) ||
+          docName.includes(catLower);
+      }
+    }
+
     const matchSearch =
       !searchQuery ||
       docName.includes(searchQuery.toLowerCase()) ||
-      docEquip.includes(searchQuery.toLowerCase());
+      docEquip.includes(searchQuery.toLowerCase()) ||
+      docType.includes(searchQuery.toLowerCase());
+
     return matchCategory && matchSearch;
   });
 
@@ -165,14 +190,23 @@ function DocumentsPage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-foreground">Project Folders</h2>
-          <button className="text-xs font-bold text-primary hover:underline cursor-pointer">
+          <button
+            onClick={() => {
+              setCategory("All");
+              setSearchQuery("");
+            }}
+            className="text-xs font-bold text-primary hover:underline cursor-pointer"
+          >
             View All
           </button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Neural Synthetics */}
-          <div className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+          <div
+            onClick={() => setCategory("All")}
+            className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
             <div className="flex items-start justify-between">
               <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                 <Brain className="h-6 w-6" />
@@ -183,7 +217,7 @@ function DocumentsPage() {
             </div>
             <div className="mt-4">
               <h3 className="text-base font-bold text-foreground">Neural Synthetics</h3>
-              <p className="text-xs text-muted-foreground">42 Active Models · Unit 300</p>
+              <p className="text-xs text-muted-foreground">RAG Vector Index · Unit 300</p>
             </div>
             <div className="flex -space-x-2 mt-4">
               <div className="w-8 h-8 rounded-full border-2 border-white bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
@@ -195,20 +229,20 @@ function DocumentsPage() {
               <div className="w-8 h-8 rounded-full border-2 border-white bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
                 HX
               </div>
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-primary text-white flex items-center justify-center text-[10px] font-bold">
-                +5
-              </div>
             </div>
           </div>
 
           {/* Cloud Fragments */}
-          <div className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+          <div
+            onClick={() => setCategory("All")}
+            className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
             <div className="flex items-start justify-between">
               <div className="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 group-hover:scale-110 transition-transform">
                 <Cloud className="h-6 w-6" />
               </div>
               <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700">
-                128 Assets
+                {displayDocs.length} Documents
               </span>
             </div>
             <div className="mt-4">
@@ -216,22 +250,22 @@ function DocumentsPage() {
               <p className="text-xs text-muted-foreground">Vector Index & Document Corpus</p>
             </div>
             <div className="mt-4 w-full bg-primary/10 rounded-full h-2 overflow-hidden">
-              <div className="bg-emerald-500 h-full rounded-full w-2/3" />
+              <div className="bg-emerald-500 h-full rounded-full w-full" />
             </div>
           </div>
 
           {/* Mhmm.ai Protocols */}
-          <div className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1">
+          <div
+            onClick={() => setCategory("SOP")}
+            className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
+          >
             <div className="flex items-start justify-between">
               <div className="w-12 h-12 rounded-2xl bg-amber-100 flex items-center justify-center text-amber-700 group-hover:scale-110 transition-transform">
                 <Terminal className="h-6 w-6" />
               </div>
               <div className="flex gap-1">
-                <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                  LOCKED
-                </span>
                 <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">
-                  V2.4
+                  Active
                 </span>
               </div>
             </div>
@@ -240,7 +274,7 @@ function DocumentsPage() {
               <p className="text-xs text-muted-foreground">Graph Extractors & Safety Rules</p>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-primary">
-              <Sparkles className="h-3.5 w-3.5" /> LangGraph Workflow v2.4
+              <Sparkles className="h-3.5 w-3.5" /> LangGraph Workflow
             </div>
           </div>
         </div>
@@ -500,19 +534,32 @@ function DocumentsPage() {
             </dl>
           </div>
 
-          <div className="flex items-center gap-3 border-t border-border/50 p-5">
+          <div className="flex flex-col gap-2 border-t border-border/50 p-5">
             <button
-              onClick={handleDownload}
-              className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:brightness-110 cursor-pointer transition-all"
+              onClick={() =>
+                navigate({
+                  to: "/query",
+                  search: { q: `Summarize key engineering procedure and failure details in document ${selected.filename || selected.name}` },
+                })
+              }
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:brightness-110 cursor-pointer transition-all"
             >
-              <Download className="h-4 w-4" /> Download Document
+              <Sparkles className="h-4 w-4" /> Ask AI about Document
             </button>
-            <button
-              onClick={handleDelete}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-100 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-200 cursor-pointer transition-all"
-            >
-              <Trash2 className="h-4 w-4" /> Delete
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDownload}
+                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl glass-panel border border-primary/30 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10 cursor-pointer transition-all"
+              >
+                <Download className="h-4 w-4" /> Download
+              </button>
+              <button
+                onClick={handleDelete}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-100 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-200 cursor-pointer transition-all"
+              >
+                <Trash2 className="h-4 w-4" /> Delete
+              </button>
+            </div>
           </div>
         </div>
       )}

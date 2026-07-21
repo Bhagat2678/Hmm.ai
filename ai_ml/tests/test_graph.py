@@ -15,9 +15,12 @@ def test_get_graph_neighborhood_success():
     assert isinstance(res["edges"], list)
 
 
-def test_get_graph_neighborhood_invalid():
-    with pytest.raises(KeyError):
-        get_graph_neighborhood("")
+def test_get_graph_neighborhood_empty():
+    res = get_graph_neighborhood("")
+    assert "nodes" in res
+    assert "edges" in res
+    assert isinstance(res["nodes"], list)
+    assert isinstance(res["edges"], list)
 
 
 def test_run_failure_scan_success():

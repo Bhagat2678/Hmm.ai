@@ -52,8 +52,12 @@ function TopProgressBar() {
   );
 }
 
+import { useAlerts } from "@/hooks/useAlerts";
+
 function StatusRail() {
   const [utcTime, setUtcTime] = useState("");
+  const { data: alerts } = useAlerts();
+  const activeAlertsCount = alerts?.filter((a: any) => !a.acknowledged).length || 0;
 
   useEffect(() => {
     const tick = () => setUtcTime(new Date().toISOString().slice(11, 16));
@@ -73,10 +77,10 @@ function StatusRail() {
       <span className="text-border">│</span>
       <span>Graph Engine: <span className="text-primary font-bold">Neo4j + pgvector</span></span>
       <span className="text-border">│</span>
-      <span className="inline-flex items-center gap-1.5">
+      <Link to="/alerts" className="inline-flex items-center gap-1.5 hover:opacity-80 transition-opacity">
         <Radio className="h-3.5 w-3.5 text-amber-500" aria-hidden />
-        <span className="text-amber-700 font-bold">3 Active Alerts</span>
-      </span>
+        <span className="text-amber-700 font-bold">{activeAlertsCount} Active Alerts</span>
+      </Link>
       <span className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground">
         {utcTime ? `UTC ${utcTime}` : ""}
       </span>
@@ -91,6 +95,33 @@ export function AppShell() {
   const { match, pathname } = useCurrentPage();
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+
+  const [profileName, setProfileName] = useState("Operator");
+  const [profileRole, setProfileRole] = useState("Reliability Eng");
+  const [avatarUrl, setAvatarUrl] = useState("");
+
+  useEffect(() => {
+    const loadProfile = () => {
+      const storedName = localStorage.getItem("mhmm-fullName");
+      const storedBio = localStorage.getItem("mhmm-bio");
+      const storedAvatar = localStorage.getItem("mhmm-avatarUrl");
+      if (storedName) setProfileName(storedName);
+      if (storedBio) {
+        const cleanBio = storedBio.split("on")[0].split("&")[0].trim();
+        setProfileRole(cleanBio.length > 20 ? cleanBio.slice(0, 20) + "..." : cleanBio);
+      } else {
+        setProfileRole("Reliability Eng");
+      }
+      if (storedAvatar) setAvatarUrl(storedAvatar);
+    };
+    loadProfile();
+    window.addEventListener("mhmm-settings-update", loadProfile);
+    window.addEventListener("storage", loadProfile);
+    return () => {
+      window.removeEventListener("mhmm-settings-update", loadProfile);
+      window.removeEventListener("storage", loadProfile);
+    };
+  }, []);
 
   useEffect(() => {
     setYear(String(new Date().getFullYear()));
@@ -245,15 +276,27 @@ export function AppShell() {
                   className="absolute right-2 top-2 h-2 w-2 rounded-full bg-amber-500 ring-2 ring-white live-dot"
                 />
               </Button>
-              <div className="hidden items-center gap-3 rounded-2xl glass-panel p-1.5 pr-3 sm:flex">
-                <div className="h-8 w-8 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs shadow-sm">
-                  OP
-                </div>
+              <Link
+                to="/settings"
+                title="Go to Workspace Settings"
+                className="hidden items-center gap-3 rounded-2xl glass-panel p-1.5 pr-3 sm:flex hover:bg-primary/10 transition-colors cursor-pointer"
+              >
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={profileName}
+                    className="h-8 w-8 rounded-xl object-cover shadow-sm border border-primary/20"
+                  />
+                ) : (
+                  <div className="h-8 w-8 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                    {profileName.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                  </div>
+                )}
                 <div className="leading-tight">
-                  <p className="text-xs font-bold text-foreground">Operator</p>
-                  <p className="text-[10px] text-muted-foreground font-semibold">Reliability Eng</p>
+                  <p className="text-xs font-bold text-foreground">{profileName}</p>
+                  <p className="text-[10px] text-muted-foreground font-semibold">{profileRole}</p>
                 </div>
-              </div>
+              </Link>
             </div>
           </div>
         </header>

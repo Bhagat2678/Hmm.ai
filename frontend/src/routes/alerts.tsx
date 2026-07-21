@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   BellRing,
@@ -59,6 +59,7 @@ const SEV_STYLES: Record<Severity, { badge: string; icon: typeof BellRing; text:
 };
 
 function AlertsPage() {
+  const navigate = useNavigate();
   const { data: apiAlerts, acknowledge, isAcknowledging, escalate, isEscalating } = useAlerts();
   const [filter, setFilter] = useState<string | "all">("all");
   const displayAlerts = apiAlerts || [];
@@ -325,21 +326,34 @@ function AlertsPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 pt-3 border-t border-border/50">
+            <div className="flex flex-col gap-2 pt-3 border-t border-border/50">
               <button
-                onClick={() => acknowledge(selected.id)}
-                disabled={selected.acknowledged || isAcknowledging}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:brightness-110 disabled:opacity-40 cursor-pointer transition-all"
+                onClick={() =>
+                  navigate({
+                    to: "/query",
+                    search: { q: `Explain the root cause and mitigation steps for alert ${selected.tag}: ${selected.title || selected.message}` },
+                  })
+                }
+                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-white shadow-md shadow-primary/25 hover:brightness-110 cursor-pointer transition-all"
               >
-                <Check className="h-4 w-4" aria-hidden /> Acknowledge
+                <Sparkles className="h-4 w-4" /> Ask AI about Alert
               </button>
-              <button
-                onClick={() => escalate(selected.id)}
-                disabled={selected.escalated || isEscalating}
-                className="inline-flex items-center justify-center gap-2 rounded-xl glass-panel border border-primary/30 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-40 cursor-pointer transition-all"
-              >
-                Escalate
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => acknowledge(selected.id)}
+                  disabled={selected.acknowledged || isAcknowledging}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl glass-panel border border-primary/30 px-4 py-2.5 text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-40 cursor-pointer transition-all"
+                >
+                  <Check className="h-4 w-4" aria-hidden /> Acknowledge
+                </button>
+                <button
+                  onClick={() => escalate(selected.id)}
+                  disabled={selected.escalated || isEscalating}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-100 px-4 py-2.5 text-xs font-bold text-red-600 hover:bg-red-200 disabled:opacity-40 cursor-pointer transition-all"
+                >
+                  Escalate
+                </button>
+              </div>
             </div>
           </aside>
         )}

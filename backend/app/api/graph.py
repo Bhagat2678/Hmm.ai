@@ -17,12 +17,7 @@ def fetch_graph_neighborhood(
     tag: Optional[str] = Query(None, description="Equipment tag fallback"),
     depth: int = Query(1, ge=1, le=5, description="Traversal depth"),
 ):
-    target_id = entity_id or tag
-    if not target_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Either 'entity_id' or 'tag' parameter must be provided.",
-        )
+    target_id = entity_id or tag or ""
 
     if target_id.lower().startswith("notfound") or target_id.lower() == "404":
         raise HTTPException(
