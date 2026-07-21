@@ -15,4 +15,11 @@ pytest
 pytest-asyncio
 python-multipart
 pyjwt
-
+langchain
+langchain-core
+langchain-google-genai
+langchain-groq
+langchain-text-splitters
+pandas
+pypdf
+pdfplumber

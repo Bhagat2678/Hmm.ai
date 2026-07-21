@@ -11,7 +11,7 @@ from app.services.ingestion_service import process_ingestion
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = "/tmp/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
@@ -63,7 +63,6 @@ async def upload_document(
         document_id=str(doc.id),
         file_content=content,
         filename=file.filename,
-        db=db,
     )
 
     # 3. Immediately return 202 Accepted
@@ -164,7 +163,6 @@ def retry_queue_item(id: str, background_tasks: BackgroundTasks, db: Session = D
         document_id=str(doc.id),
         file_content=content,
         filename=doc.filename,
-        db=db,
     )
     create_audit_entry(db, action="document_retry", details={"document_id": id})
     return {"status": "pending", "document_id": id}

@@ -88,6 +88,7 @@ function UploadPage() {
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       uploadDocument(file);
+      e.target.value = '';
     }
   };
 
@@ -123,10 +124,11 @@ function UploadPage() {
       <section className="grid grid-cols-1 gap-3 lg:grid-cols-3">
         <div className="col-span-1 lg:col-span-2">
           <div
+            onClick={() => fileInputRef.current?.click()}
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
             className={cn(
-              "group relative flex min-h-[260px] flex-col items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-border-strong bg-card/50 p-8 text-center transition-colors hover:border-primary/60 hover:bg-primary/5",
+              "group relative flex min-h-[260px] flex-col items-center justify-center overflow-hidden rounded-md border-2 border-dashed border-border-strong bg-card/50 p-8 text-center transition-colors hover:border-primary/60 hover:bg-primary/5 cursor-pointer",
               isPending && "opacity-50 pointer-events-none"
             )}
           >
@@ -151,9 +153,14 @@ function UploadPage() {
                 className="hidden"
                 ref={fileInputRef}
                 onChange={handleFileChange}
+                onClick={(e) => e.stopPropagation()}
               />
-              <button 
-                onClick={() => fileInputRef.current?.click()}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  fileInputRef.current?.click();
+                }}
                 disabled={isPending}
                 className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
               >
@@ -161,7 +168,9 @@ function UploadPage() {
                 Select files
               </button>
               <button 
-                onClick={() => {
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
                   const url = window.prompt("Enter document URL to import:");
                   if (url) importUrl(url);
                 }} 
@@ -217,7 +226,7 @@ function UploadPage() {
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             <button className="hover:text-foreground cursor-pointer">Pause all</button>
             <span className="text-border-strong">│</span>
-            <button onClick={() => clearCompleted()} className="hover:text-foreground cursor-pointer">Clear completed</button>
+            <button type="button" onClick={() => clearCompleted()} className="hover:text-foreground cursor-pointer">Clear completed</button>
           </div>
         </div>
         <ul className="divide-y divide-border">
@@ -274,6 +283,7 @@ function UploadPage() {
                 <div className="flex items-center gap-2">
                   {f.status === "failed" && (
                     <button
+                      type="button"
                       onClick={() => retryUpload(f.id)}
                       aria-label="Retry"
                       className="text-xs text-primary hover:underline cursor-pointer"
@@ -282,6 +292,7 @@ function UploadPage() {
                     </button>
                   )}
                   <button
+                    type="button"
                     onClick={() => cancelUpload(f.id)}
                     aria-label="Cancel"
                     className="grid h-8 w-8 place-items-center rounded-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"

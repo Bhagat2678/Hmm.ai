@@ -35,6 +35,7 @@ class Neo4jClient:
                 logger.info(f"Connected to Neo4j AuraDB at '{self.uri}'")
             except Exception as e:
                 logger.warning(f"Could not connect to Neo4j AuraDB ({e}). Using NetworkX memory fallback graph.")
+                self.driver = None
 
     def close(self):
         if self.driver:

@@ -58,13 +58,14 @@ class VectorStore:
                 with self.engine.begin() as conn:
                     for chunk, vec in zip(chunks, embeddings):
                         str_vec = "[" + ",".join(str(f) for f in vec) + "]"
+                        chunk_txt = (chunk.get("text") or "").replace("\x00", "")
                         query = text("""
                             INSERT INTO document_chunks (document_id, chunk_text, embedding)
                             VALUES (:doc_id, :text, CAST(:embedding AS vector))
                         """)
                         conn.execute(query, {
                             "doc_id": chunk.get("document_id"),
-                            "text": chunk.get("text"),
+                            "text": chunk_txt,
                             "embedding": str_vec
                         })
                         added_count += 1

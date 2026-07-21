@@ -35,19 +35,23 @@ class DocumentLoader:
         if ext == "pdf" or (mime_type and "pdf" in mime_type):
             return self._load_pdf(file_content)
 
-        # 2. Excel / CSV
-        elif ext in ["xlsx", "xls", "csv"]:
-            return self._load_spreadsheet(file_content, ext), None, "text/plain"
+        # 2. DOCX / DOC
+        elif ext in ["docx", "doc"]:
+            return self._load_docx(file_content).replace("\x00", ""), None, "text/plain"
 
-        # 3. Image (JPEG, PNG, WEBP) - for P&ID / scanned forms
+        # 3. Excel / CSV
+        elif ext in ["xlsx", "xls", "csv"]:
+            return self._load_spreadsheet(file_content, ext).replace("\x00", ""), None, "text/plain"
+
+        # 4. Image (JPEG, PNG, WEBP) - for P&ID / scanned forms
         elif ext in ["png", "jpg", "jpeg", "webp"] or (mime_type and "image" in mime_type):
             mtype = f"image/{ext}" if ext in ["png", "jpg", "jpeg", "webp"] else "image/jpeg"
             return "", file_content, mtype
 
-        # 4. Text / Markdown / Log / EML
+        # 5. Text / Markdown / Log / EML
         else:
             try:
-                text = file_content.decode("utf-8", errors="replace")
+                text = file_content.decode("utf-8", errors="replace").replace("\x00", "")
                 return text, None, "text/plain"
             except Exception as e:
                 logger.error(f"Failed to decode text file: {e}")
@@ -94,6 +98,19 @@ class DocumentLoader:
             return df.to_string(index=False)
         except Exception as e:
             logger.error(f"Failed to parse spreadsheet: {e}")
+            return file_content.decode("utf-8", errors="ignore")
+
+    def _load_docx(self, file_content: bytes) -> str:
+        try:
+            import zipfile
+            import xml.etree.ElementTree as ET
+            with zipfile.ZipFile(io.BytesIO(file_content)) as z:
+                xml_content = z.read("word/document.xml")
+            tree = ET.fromstring(xml_content)
+            texts = [node.text for node in tree.iter() if node.text]
+            return "\n".join(texts)
+        except Exception as e:
+            logger.warning(f"Zipfile docx extraction failed: {e}")
             return file_content.decode("utf-8", errors="ignore")
 
 

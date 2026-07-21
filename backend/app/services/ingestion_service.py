@@ -1,5 +1,6 @@
 from typing import Dict, Any, Optional
 from sqlalchemy.orm import Session
+from app.db.session import SessionLocal
 from app.core.config import settings
 from app.core.logging import logger
 from app.crud.document import update_document_status
@@ -16,7 +17,6 @@ def process_ingestion(
     document_id: str,
     file_content: bytes,
     filename: str,
-    db: Session,
     metadata: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
@@ -27,10 +27,10 @@ def process_ingestion(
     logger.info(f"Starting ingestion for document_id={document_id}, filename={filename}")
     meta = metadata or {"filename": filename, "document_id": document_id}
 
-    # Update status to processing
-    update_document_status(db, document_id, status="processing")
-
+    db = SessionLocal()
     try:
+        # Update status to processing
+        update_document_status(db, document_id, status="processing")
         if not callable(ingest_document):
             raise RuntimeError(
                 "ai_ml.interfaces.ingest_document is not available. "
@@ -76,4 +76,5 @@ def process_ingestion(
             },
         )
         raise e
-
+    finally:
+        db.close()

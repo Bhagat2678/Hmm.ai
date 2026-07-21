@@ -8,3 +8,5 @@ sentence-transformers
 pydantic
 pandas
 pypdf
+langchain-text-splitters
+pdfplumber
