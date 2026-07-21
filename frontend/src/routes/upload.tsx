@@ -81,13 +81,9 @@ function UploadPage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-<<<<<<< HEAD
       const file = e.target.files[0];
       uploadDocument(file);
       e.target.value = '';
-=======
-      uploadDocument(e.target.files[0]);
->>>>>>> 91fc680 (Remove hardcoded mock data, add clean empty states, and fix database dialect compatibility)
     }
   };
 
