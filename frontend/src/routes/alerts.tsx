@@ -25,11 +25,11 @@ import { formatDistanceToNow } from "date-fns";
 export const Route = createFileRoute("/alerts")({
   head: () => ({
     meta: [
-      { title: "Alerts - Mhmm.ai" },
+      { title: "Alerts - Bedrock" },
       {
         name: "description",
         content:
-          "Predictive maintenance and rule-based alerts for industrial assets, ranked and enriched by Mhmm.ai.",
+          "Predictive maintenance and rule-based alerts for industrial assets, ranked and enriched by Bedrock.",
       },
     ],
   }),

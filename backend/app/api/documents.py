@@ -199,7 +199,7 @@ def fetch_and_ingest_url(document_id: str, url: str, filename: str):
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "MhmmAI-Ingestion-Bot/1.0"}
+            headers={"User-Agent": "Bedrock-Ingestion-Bot/1.0"}
         )
         with urllib.request.urlopen(req, timeout=15) as response:
             content = response.read()

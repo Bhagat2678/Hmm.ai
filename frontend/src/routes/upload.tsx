@@ -24,11 +24,11 @@ import { useRef } from "react";
 export const Route = createFileRoute("/upload")({
   head: () => ({
     meta: [
-      { title: "Upload - Mhmm.ai" },
+      { title: "Upload - Bedrock" },
       {
         name: "description",
         content:
-          "Ingest industrial documents into the Mhmm.ai knowledge intelligence pipeline: P&IDs, SOPs, manuals, and inspection reports.",
+          "Ingest industrial documents into the Bedrock knowledge intelligence pipeline: P&IDs, SOPs, manuals, and inspection reports.",
       },
     ],
   }),

@@ -1,7 +1,7 @@
-# Integration Contract - Mhmm.ai
+# Integration Contract - Bedrock
 
 ## 1. Purpose
-This document serves as the single source of truth for how every module in the **Mhmm.ai** platform communicates. It is not an architecture overview, but rather a strict integration contract. It defines API boundaries, function interfaces, data ownership, request/response schemas, integration flows, and strict rules for interaction. By adhering to this contract, all developers across Frontend, Backend, AI/ML, and Infrastructure can work independently and integrate seamlessly with minimal conflicts.
+This document serves as the single source of truth for how every module in the **Bedrock** platform communicates. It is not an architecture overview, but rather a strict integration contract. It defines API boundaries, function interfaces, data ownership, request/response schemas, integration flows, and strict rules for interaction. By adhering to this contract, all developers across Frontend, Backend, AI/ML, and Infrastructure can work independently and integrate seamlessly with minimal conflicts.
 
 Every module must communicate **only** through the interfaces defined in this document.
 

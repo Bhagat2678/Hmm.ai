@@ -1,4 +1,4 @@
-# 🏭 Mhmm.ai — Industrial Knowledge Intelligence Platform
+# 🏭 Bedrock — Industrial Knowledge Intelligence Platform
 
 An AI-powered operational intelligence platform for ingesting, processing, and querying complex industrial engineering knowledge using Retrieval-Augmented Generation (RAG), pgvector vector search, and graph databases.
 
@@ -46,7 +46,7 @@ flowchart TD
 
 ## 🚀 Quick Start Instructions
 
-Mhmm.ai supports a **Native Development Workflow** (no Docker required for day-to-day work, using Supabase PostgreSQL + Neo4j AuraDB cloud backends) as well as an optional Docker workflow.
+Bedrock supports a **Native Development Workflow** (no Docker required for day-to-day work, using Supabase PostgreSQL + Neo4j AuraDB cloud backends) as well as an optional Docker workflow.
 
 ### Prerequisites
 - [Python 3.10+](https://www.python.org/downloads/)

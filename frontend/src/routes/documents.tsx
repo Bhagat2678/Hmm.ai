@@ -30,11 +30,11 @@ import { formatDistanceToNow } from "date-fns";
 export const Route = createFileRoute("/documents")({
   head: () => ({
     meta: [
-      { title: "Workspace Explorer - Mhmm.ai" },
+      { title: "Workspace Explorer - Bedrock" },
       {
         name: "description",
         content:
-          "Manage industrial documents ingested into Mhmm.ai - P&IDs, SOPs, manuals, and inspection reports with knowledge extraction status.",
+          "Manage industrial documents ingested into Bedrock - P&IDs, SOPs, manuals, and inspection reports with knowledge extraction status.",
       },
     ],
   }),
@@ -265,7 +265,7 @@ function DocumentsPage() {
             </div>
           </div>
 
-          {/* Mhmm.ai Protocols */}
+          {/* Bedrock Protocols */}
           <div
             onClick={() => setCategory("SOP")}
             className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -281,7 +281,7 @@ function DocumentsPage() {
               </div>
             </div>
             <div className="mt-4">
-              <h3 className="text-base font-bold text-foreground">Mhmm.ai Protocols</h3>
+              <h3 className="text-base font-bold text-foreground">Bedrock Protocols</h3>
               <p className="text-xs text-muted-foreground">Graph Extractors & Safety Rules</p>
             </div>
             <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-primary">

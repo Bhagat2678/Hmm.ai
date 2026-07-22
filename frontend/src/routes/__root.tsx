@@ -99,15 +99,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Mhmm.ai — Industrial Knowledge Intelligence" },
+      { title: "Bedrock — Industrial Knowledge Intelligence" },
       {
         name: "description",
         content:
-          "Query, visualize, and monitor industrial equipment intelligence. Mhmm.ai unifies documents, knowledge graphs, and predictive alerts for operators and engineers.",
+          "Query, visualize, and monitor industrial equipment intelligence. Bedrock unifies documents, knowledge graphs, and predictive alerts for operators and engineers.",
       },
-      { name: "author", content: "Mhmm.ai" },
+      { name: "author", content: "Bedrock" },
       { name: "theme-color", content: "#0f172a" },
-      { property: "og:title", content: "Mhmm.ai — Industrial Knowledge Intelligence" },
+      { property: "og:title", content: "Bedrock — Industrial Knowledge Intelligence" },
       {
         property: "og:description",
         content:
@@ -115,7 +115,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Mhmm.ai — Industrial Knowledge Intelligence" },
+      { name: "twitter:title", content: "Bedrock — Industrial Knowledge Intelligence" },
       {
         name: "twitter:description",
         content:

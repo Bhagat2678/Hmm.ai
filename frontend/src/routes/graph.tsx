@@ -25,7 +25,7 @@ import { useKnowledgeGraph } from "../hooks/useKnowledgeGraph";
 export const Route = createFileRoute("/graph")({
   head: () => ({
     meta: [
-      { title: "Knowledge Graph - Mhmm.ai" },
+      { title: "Knowledge Graph - Bedrock" },
       {
         name: "description",
         content:

@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Mhmm.ai Native Development Startup Script (Default Non-Docker Workflow)
+# Bedrock Native Development Startup Script (Default Non-Docker Workflow)
 # ==============================================================================
 
 set -e
@@ -28,7 +28,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 cd "${ROOT_DIR}"
 
-log_info "Starting Mhmm.ai Platform Natively (No Docker Required)..."
+log_info "Starting Bedrock Platform Natively (No Docker Required)..."
 
 # 1. Activate Python Virtual Environment
 if [ -d ".venv" ]; then
@@ -49,7 +49,7 @@ fi
 
 # Cleanup child processes on exit
 cleanup() {
-    log_warn "\nShutting down Mhmm.ai native services..."
+    log_warn "\nShutting down Bedrock native services..."
     kill $(jobs -p) 2>/dev/null || true
     exit 0
 }
@@ -76,7 +76,7 @@ log_info "Launching React Vite frontend on http://localhost:5173..."
 FRONTEND_PID=$!
 
 echo -e "${CYAN}====================================================${NC}"
-echo -e "${GREEN}🚀 Mhmm.ai Platform Running Natively!${NC}"
+echo -e "${GREEN}🚀 Bedrock Platform Running Natively!${NC}"
 echo -e "${CYAN}====================================================${NC}"
 echo -e "📡 Backend API:         ${GREEN}http://localhost:8000${NC}"
 echo -e "📖 API OpenAPI Docs:     ${GREEN}http://localhost:8000/docs${NC}"

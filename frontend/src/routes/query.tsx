@@ -36,11 +36,11 @@ export const Route = createFileRoute("/query")({
   },
   head: () => ({
     meta: [
-      { title: "Cosmic Intelligence — Mhmm.ai" },
+      { title: "Cosmic Intelligence — Bedrock" },
       {
         name: "description",
         content:
-          "Ask Mhmm.ai Cosmic Intelligence natural-language questions about equipment, SOPs, and engineering knowledge with cited answers.",
+          "Ask Bedrock Cosmic Intelligence natural-language questions about equipment, SOPs, and engineering knowledge with cited answers.",
       },
     ],
   }),

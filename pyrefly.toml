@@ -1,4 +1,4 @@
-# Pyrefly configuration for Mhmm.ai
+# Pyrefly configuration for Bedrock
 # Packages like sqlalchemy, fastapi, pydantic, pgvector are installed
 # inside Docker — not locally — so we suppress missing-import errors.
 

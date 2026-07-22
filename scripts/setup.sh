@@ -1,6 +1,6 @@
 #!/bin/bash
 # ==============================================================================
-# Mhmm.ai Developer Setup Script (Native Workflow Default)
+# Bedrock Developer Setup Script (Native Workflow Default)
 # ==============================================================================
 
 set -e
@@ -28,7 +28,7 @@ ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 cd "${ROOT_DIR}"
 
-log_info "Setting up Mhmm.ai Native Development Environment..."
+log_info "Setting up Bedrock Native Development Environment..."
 
 # 1. Environment files setup
 if [ ! -f .env ]; then

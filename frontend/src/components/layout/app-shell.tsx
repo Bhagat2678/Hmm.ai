@@ -71,7 +71,7 @@ function StatusRail() {
 
   return (
     <div className="flex items-center justify-between border-b border-border/40 bg-white/40 px-8 py-2 font-sans text-xs font-bold text-muted-foreground backdrop-blur-sm">
-      <span className="text-foreground font-extrabold tracking-tight text-sm">Mhmm.ai</span>
+      <span className="text-foreground font-extrabold tracking-tight text-sm">Bedrock</span>
       <span className="font-mono text-xs tabular-nums text-foreground font-bold">
         {utcTime ? `UTC ${utcTime}` : ""}
       </span>
@@ -93,9 +93,9 @@ export function AppShell() {
 
   useEffect(() => {
     const loadProfile = () => {
-      const storedName = localStorage.getItem("mhmm-fullName");
-      const storedBio = localStorage.getItem("mhmm-bio");
-      const storedAvatar = localStorage.getItem("mhmm-avatarUrl");
+      const storedName = localStorage.getItem("bedrock-fullName");
+      const storedBio = localStorage.getItem("bedrock-bio");
+      const storedAvatar = localStorage.getItem("bedrock-avatarUrl");
       if (storedName) setProfileName(storedName);
       if (storedBio) {
         const cleanBio = storedBio.split("on")[0].split("&")[0].trim();
@@ -106,10 +106,10 @@ export function AppShell() {
       if (storedAvatar) setAvatarUrl(storedAvatar);
     };
     loadProfile();
-    window.addEventListener("mhmm-settings-update", loadProfile);
+    window.addEventListener("bedrock-settings-update", loadProfile);
     window.addEventListener("storage", loadProfile);
     return () => {
-      window.removeEventListener("mhmm-settings-update", loadProfile);
+      window.removeEventListener("bedrock-settings-update", loadProfile);
       window.removeEventListener("storage", loadProfile);
     };
   }, []);
@@ -210,7 +210,7 @@ export function AppShell() {
                 className="flex min-w-0 items-center gap-1.5 text-xs font-bold text-muted-foreground"
               >
                 <Link to="/" className="hidden shrink-0 hover:text-primary sm:inline">
-                  Mhmm.ai
+                  Bedrock
                 </Link>
                 <ChevronRight className="hidden h-3.5 w-3.5 shrink-0 text-muted-foreground/60 sm:inline" aria-hidden />
                 <span className="truncate text-primary font-bold">
@@ -301,7 +301,7 @@ export function AppShell() {
 
         <footer className="border-t border-border/40 px-6 py-4 text-xs font-semibold text-muted-foreground sm:px-8">
           <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3">
-            <span>© {year || "2026"} Mhmm.ai · Industrial Knowledge Intelligence Platform</span>
+            <span>© {year || "2026"} Bedrock · Industrial Knowledge Intelligence Platform</span>
             <span className="inline-flex items-center gap-1.5 text-emerald-600 font-bold">
               <span className="live-dot h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
               <span>Online</span>

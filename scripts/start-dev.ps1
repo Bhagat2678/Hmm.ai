@@ -1,10 +1,10 @@
 # ==============================================================================
-# Mhmm.ai Native Development Startup Script for Windows (PowerShell)
+# Bedrock Native Development Startup Script for Windows (PowerShell)
 # ==============================================================================
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "[INFO] Starting Mhmm.ai Platform Natively..." -ForegroundColor Cyan
+Write-Host "[INFO] Starting Bedrock Platform Natively..." -ForegroundColor Cyan
 
 $ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $RootDir = Split-Path -Path $ScriptDir -Parent
@@ -29,7 +29,7 @@ Write-Host "[INFO] Starting Frontend Dev Server on http://localhost:5173..." -Fo
 Set-Location "$RootDir\frontend"
 
 Write-Host "====================================================" -ForegroundColor Cyan
-Write-Host "🚀 Mhmm.ai Platform Running Natively!" -ForegroundColor Green
+Write-Host "🚀 Bedrock Platform Running Natively!" -ForegroundColor Green
 Write-Host "====================================================" -ForegroundColor Cyan
 Write-Host "📡 Backend API:         http://localhost:8000" -ForegroundColor White
 Write-Host "📖 API OpenAPI Docs:     http://localhost:8000/docs" -ForegroundColor White

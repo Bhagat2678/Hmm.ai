@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: [
-      { title: "Workspace Settings - Mhmm.ai" },
+      { title: "Workspace Settings - Bedrock" },
       {
         name: "description",
         content: "Manage your profile, visual preferences, and API integrations.",
@@ -34,32 +34,32 @@ function SettingsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [avatarUrl, setAvatarUrl] = useState(() => {
     return (
-      localStorage.getItem("mhmm-avatarUrl") ||
+      localStorage.getItem("bedrock-avatarUrl") ||
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60"
     );
   });
   const [fullName, setFullName] = useState(() => {
-    return localStorage.getItem("mhmm-fullName") || "Operator";
+    return localStorage.getItem("bedrock-fullName") || "Operator";
   });
   const [handle, setHandle] = useState(() => {
-    return localStorage.getItem("mhmm-handle") || "operator_eng";
+    return localStorage.getItem("bedrock-handle") || "operator_eng";
   });
   const [bio, setBio] = useState(() => {
     return (
-      localStorage.getItem("mhmm-bio") ||
+      localStorage.getItem("bedrock-bio") ||
       "Reliability Engineer & Operator on Unit 300 Refinery Operations."
     );
   });
 
   const [clarityThreshold, setClarityThreshold] = useState(() => {
-    return localStorage.getItem("mhmm-clarityThreshold") || "85";
+    return localStorage.getItem("bedrock-clarityThreshold") || "85";
   });
   const [emailAlerts, setEmailAlerts] = useState(() => {
-    const val = localStorage.getItem("mhmm-emailAlerts");
+    const val = localStorage.getItem("bedrock-emailAlerts");
     return val !== null ? JSON.parse(val) : true;
   });
   const [vibrationAlerts, setVibrationAlerts] = useState(() => {
-    const val = localStorage.getItem("mhmm-vibrationAlerts");
+    const val = localStorage.getItem("bedrock-vibrationAlerts");
     return val !== null ? JSON.parse(val) : true;
   });
   const [isSaved, setIsSaved] = useState(false);
@@ -78,17 +78,17 @@ function SettingsPage() {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem("mhmm-fullName", fullName);
-    localStorage.setItem("mhmm-handle", handle);
-    localStorage.setItem("mhmm-bio", bio);
-    localStorage.setItem("mhmm-clarityThreshold", clarityThreshold);
-    localStorage.setItem("mhmm-emailAlerts", JSON.stringify(emailAlerts));
-    localStorage.setItem("mhmm-vibrationAlerts", JSON.stringify(vibrationAlerts));
-    localStorage.setItem("mhmm-avatarUrl", avatarUrl);
+    localStorage.setItem("bedrock-fullName", fullName);
+    localStorage.setItem("bedrock-handle", handle);
+    localStorage.setItem("bedrock-bio", bio);
+    localStorage.setItem("bedrock-clarityThreshold", clarityThreshold);
+    localStorage.setItem("bedrock-emailAlerts", JSON.stringify(emailAlerts));
+    localStorage.setItem("bedrock-vibrationAlerts", JSON.stringify(vibrationAlerts));
+    localStorage.setItem("bedrock-avatarUrl", avatarUrl);
 
     setIsSaved(true);
     toast.success("Workspace settings saved successfully");
-    window.dispatchEvent(new Event("mhmm-settings-update"));
+    window.dispatchEvent(new Event("bedrock-settings-update"));
     setTimeout(() => setIsSaved(false), 2000);
   };
 
