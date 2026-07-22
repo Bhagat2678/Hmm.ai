@@ -114,7 +114,7 @@ Unlike traditional vector search that only finds keyword-similar text snippets, 
 
    # Auth & Frontend
    JWT_SECRET=default_hackathon_jwt_secret_key_change_me
-   VITE_API_BASE_URL=http://localhost:8000/api
+   VITE_API_BASE_URL=http://<host-ip>:8000/api
    ```
 
 3. **Launch Platform**:
@@ -124,8 +124,8 @@ Unlike traditional vector search that only finds keyword-similar text snippets, 
    ```
 
    Access the application:
-   * **Frontend Workspace**: [http://localhost:5173](http://localhost:5173)
-   * **Backend API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+   * **Frontend Workspace**: Port 5173 (`http://<host-ip>:5173`)
+   * **Backend API Docs**: Port 8000 (`http://<host-ip>:8000/docs`)
 
 ---
 
@@ -141,9 +141,9 @@ docker compose up -d
 docker ps
 ```
 
-* **Frontend**: [http://localhost:5173](http://localhost:5173)
-* **Backend API**: [http://localhost:8000](http://localhost:8000)
-* **PostgreSQL pgvector**: `localhost:5434`
+* **Frontend**: Port 5173 (`http://<host-ip>:5173`)
+* **Backend API**: Port 8000 (`http://<host-ip>:8000`)
+* **PostgreSQL pgvector**: Port 5434
 
 ---
 
@@ -171,7 +171,7 @@ For hackathon presentation recording:
 2. **[0:30 - 1:30] Ingestion Demo**: Navigate to **Ingestion**, drag-and-drop `sample_sop_301.txt`, and watch entity extraction populate document chunks.
 3. **[1:30 - 2:30] Knowledge Graph Exploration**: Click **Knowledge Graph**, view color-coded equipment (`P-101`), sensors (`TT-301` in green), and document nodes (`sample_sop_301.txt` in slate-gray).
 4. **[2:30 - 3:30] Hybrid RAG Query**: Open **Cosmic Intelligence**, query *"What is the operating procedure for thermal transmitter TT-301?"*, and review the citation-backed answer.
-5. **[3:30 - 4:00] Failure Alerts**: Open **Alerts** to showcase the high-severity alert for temperature anomaly on `TT-301`.
+5. **[3:30 - 4:00] Failure Alerts**: Open **Alerts** (`/alerts`) to showcase the high-severity alert for temperature anomaly on `TT-301`.
 
 ---
 

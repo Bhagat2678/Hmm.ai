@@ -82,9 +82,9 @@ Once running, access the platform endpoints:
 
 | Service | Access URL | Description |
 |---|---|---|
-| **Frontend Workspace** | [http://localhost:5173](http://localhost:5173) | Interactive Operator Portal & Knowledge Graph Canvas |
-| **Backend REST API** | [http://localhost:8000](http://localhost:8000) | FastAPI REST Service |
-| **OpenAPI Documentation** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive Swagger UI API Docs |
+| **Frontend Workspace** | Port 5173 (`http://<host-ip>:5173`) | Interactive Operator Portal & Knowledge Graph Canvas |
+| **Backend REST API** | Port 8000 (`http://<host-ip>:8000`) | FastAPI REST Service |
+| **OpenAPI Documentation** | Port 8000 (`http://<host-ip>:8000/docs`) | Interactive Swagger UI API Docs |
 
 ---
 
@@ -141,7 +141,7 @@ GROQ_API_KEY=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
 
 # Auth & Frontend
 JWT_SECRET=default_hackathon_jwt_secret_key_change_me
-VITE_API_BASE_URL=http://localhost:8000/api
+VITE_API_BASE_URL=http://<host-ip>:8000/api
 ```
 
 ---
