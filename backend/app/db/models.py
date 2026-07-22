@@ -86,6 +86,7 @@ class Document(Base):
     filename: Mapped[str] = mapped_column(Text, nullable=False)
     document_type: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     uploaded_by: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    file_size: Mapped[Optional[int]] = mapped_column(Text, nullable=True)
     uploaded_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), default=func.now(), nullable=False
     )

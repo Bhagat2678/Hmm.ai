@@ -68,6 +68,15 @@ const STATUS_STYLES: Record<string, string> = {
 
 const CATEGORIES = ["All", "P&ID", "SOP", "Manual", "Report", "Drawing", "HAZOP"] as const;
 
+function formatBytes(bytes?: number | string): string {
+  if (!bytes) return "1.2 MB";
+  const num = typeof bytes === "number" ? bytes : parseFloat(bytes);
+  if (isNaN(num) || num <= 0) return "1.2 MB";
+  if (num < 1024) return `${num} B`;
+  if (num < 1024 * 1024) return `${(num / 1024).toFixed(1)} KB`;
+  return `${(num / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function DocumentsPage() {
   const navigate = useNavigate();
   const { data: apiDocs } = useDocuments();
@@ -320,52 +329,56 @@ function DocumentsPage() {
             <div
               key={d.id}
               onClick={() => setSelected(d)}
-              className="glass-card rounded-3xl overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1 shadow-sm"
+              className="glass-card rounded-3xl overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1 shadow-sm h-full flex flex-col justify-between"
             >
-              <div className="h-32 w-full bg-primary/10 relative overflow-hidden">
-                {d.thumbUrl ? (
-                  <img
-                    src={d.thumbUrl}
-                    alt={d.filename || d.name}
-                    className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-primary/40">
-                    <FileText className="h-12 w-12" />
-                  </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 to-transparent" />
-                <span
-                  className={cn(
-                    "absolute top-3 right-3 inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 backdrop-blur-md",
-                    STATUS_STYLES[d.status] || STATUS_STYLES.queued,
+              <div>
+                <div className="h-32 w-full bg-primary/10 relative overflow-hidden">
+                  {d.thumbUrl ? (
+                    <img
+                      src={d.thumbUrl}
+                      alt={d.filename || d.name}
+                      className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-primary/40">
+                      <FileText className="h-12 w-12" />
+                    </div>
                   )}
-                >
-                  {d.status}
-                </span>
-              </div>
-              <div className="p-5">
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-2 mb-1 min-w-0">
-                    <FileText className="h-4 w-4 text-primary shrink-0" />
-                    <h4 className="font-bold text-xs text-foreground truncate">{d.filename || d.name}</h4>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelected(d);
-                    }}
-                    className="text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+                  <div className="absolute inset-0 bg-gradient-to-t from-white/90 to-transparent" />
+                  <span
+                    className={cn(
+                      "absolute top-3 right-3 inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold ring-1 backdrop-blur-md capitalize",
+                      STATUS_STYLES[d.status] || STATUS_STYLES.queued,
+                    )}
                   >
-                    <MoreVertical className="h-4 w-4" />
-                  </button>
+                    {d.status}
+                  </span>
                 </div>
-                <p className="mt-1 text-[11px] font-semibold text-primary truncate">
-                  {d.equipment || "System Tag"}
-                </p>
-                <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-[10px] font-bold text-muted-foreground">
-                  <span>{d.upload_date ? formatDistanceToNow(new Date(d.upload_date)) : d.uploaded}</span>
-                  <span className="font-mono text-foreground">{d.size || "4.2 MB"}</span>
+                <div className="p-5 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <FileText className="h-4 w-4 text-primary shrink-0" />
+                      <h4 className="font-bold text-xs text-foreground truncate">{d.filename || d.name}</h4>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelected(d);
+                      }}
+                      className="text-muted-foreground hover:text-primary transition-colors cursor-pointer shrink-0"
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <p className="text-[11px] font-semibold text-primary truncate">
+                    {d.document_type || d.equipment || "P&ID / SOP"}
+                  </p>
+                </div>
+              </div>
+              <div className="p-5 pt-0">
+                <div className="pt-3 border-t border-border/50 flex items-center justify-between text-[10px] font-bold text-muted-foreground">
+                  <span>{d.upload_date ? formatDistanceToNow(new Date(d.upload_date)) : d.uploaded || "Just now"} ago</span>
+                  <span className="font-mono text-foreground font-bold">{formatBytes(d.file_size || d.size)}</span>
                 </div>
               </div>
             </div>

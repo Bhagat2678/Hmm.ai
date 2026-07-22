@@ -799,39 +799,40 @@ function StatusChip({ status }: { status: string }) {
 /* ---------- Process Telemetry ---------- */
 
 function ProcessTelemetry({ stats }: { stats?: any }) {
+  const metrics = [
+    { label: "Documents Ingested", value: stats?.documents_total ?? 0, color: "text-foreground" },
+    { label: "PGVector Chunks", value: stats?.chunks_total ?? 0, color: "text-foreground" },
+    { label: "Graph Nodes", value: stats?.graph_nodes ?? 0, color: "text-primary" },
+    { label: "Graph Edges", value: stats?.graph_edges ?? 0, color: "text-emerald-600" },
+  ];
+
   return (
-    <GlassCard>
+    <GlassCard className="h-full flex flex-col justify-between">
       <CardHeader
         icon={Activity}
         title="Process Telemetry"
-        action={<span className="text-[11px] font-semibold text-muted-foreground">Live Telemetry</span>}
+        action={
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+            <span className="live-dot h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+            Live Backend Metrics
+          </span>
+        }
       />
-      <div className="p-5">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="glass-panel p-3.5 rounded-2xl text-center">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground">Documents</p>
-            <p className="text-xl font-bold text-foreground mt-1 tabular-nums">
-              {stats?.documents_total ?? 0}
-            </p>
-          </div>
-          <div className="glass-panel p-3.5 rounded-2xl text-center">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground">PGVector Chunks</p>
-            <p className="text-xl font-bold text-foreground mt-1 tabular-nums">
-              {stats?.chunks_total ?? 0}
-            </p>
-          </div>
-          <div className="glass-panel p-3.5 rounded-2xl text-center">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground">Graph Nodes</p>
-            <p className="text-xl font-bold text-primary mt-1 tabular-nums">
-              {stats?.graph_nodes ?? 0}
-            </p>
-          </div>
-          <div className="glass-panel p-3.5 rounded-2xl text-center">
-            <p className="text-[10px] uppercase font-bold text-muted-foreground">24h AI Queries</p>
-            <p className="text-xl font-bold text-emerald-600 mt-1 tabular-nums">
-              {stats?.queries_24h ?? 0}
-            </p>
-          </div>
+      <div className="p-5 flex-1 flex flex-col justify-center">
+        <div className="grid grid-cols-2 gap-4">
+          {metrics.map((m) => (
+            <div
+              key={m.label}
+              className="glass-panel rounded-2xl p-5 flex flex-col items-center justify-center text-center transition-all duration-200 hover:border-primary/30 hover:shadow-sm"
+            >
+              <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground min-h-[28px] flex items-center justify-center">
+                {m.label}
+              </p>
+              <p className={cn("text-2xl font-extrabold mt-1 tabular-nums tracking-tight", m.color)}>
+                {m.value}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </GlassCard>

@@ -2,6 +2,7 @@ export interface Document {
   id: string;
   filename: string;
   document_type?: string;
+  file_size?: number;
   upload_date?: string;
   created_at?: string;
   status: 'pending' | 'processing' | 'completed' | 'ingested' | 'failed' | 'paused';

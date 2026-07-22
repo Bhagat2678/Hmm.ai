@@ -42,7 +42,8 @@ async def upload_document(
     doc = create_document(
         db,
         filename=file.filename,
-        document_type=file.content_type or "application/octet-stream",
+        document_type=file.content_type or "application/pdf",
+        file_size=len(content),
         status="pending",
     )
 

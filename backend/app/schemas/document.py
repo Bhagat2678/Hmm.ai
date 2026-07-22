@@ -6,6 +6,7 @@ class DocumentSchema(BaseModel):
     id: str
     filename: str
     document_type: str | None = None
+    file_size: int | None = None
     upload_date: datetime
     status: str
 
@@ -20,6 +21,7 @@ class DocumentSchema(BaseModel):
                 "id": str(data.id),
                 "filename": data.filename,
                 "document_type": getattr(data, "document_type", None),
+                "file_size": getattr(data, "file_size", None),
                 "upload_date": data.uploaded_at,
                 "status": data.status,
             }

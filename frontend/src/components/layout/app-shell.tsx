@@ -56,32 +56,23 @@ import { useAlerts } from "@/hooks/useAlerts";
 
 function StatusRail() {
   const [utcTime, setUtcTime] = useState("");
-  const { data: alerts } = useAlerts();
-  const activeAlertsCount = alerts?.filter((a: any) => !a.acknowledged).length || 0;
 
   useEffect(() => {
-    const tick = () => setUtcTime(new Date().toISOString().slice(11, 16));
+    const tick = () => {
+      const now = new Date();
+      const hh = String(now.getUTCHours()).padStart(2, "0");
+      const mm = String(now.getUTCMinutes()).padStart(2, "0");
+      setUtcTime(`${hh}:${mm}`);
+    };
     tick();
-    const id = setInterval(tick, 60_000);
+    const id = setInterval(tick, 1000);
     return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="hidden items-center gap-4 border-b border-border/40 bg-white/40 px-8 py-1.5 font-sans text-xs font-semibold text-muted-foreground backdrop-blur-sm lg:flex">
-      <span className="inline-flex items-center gap-1.5">
-        <span className="live-dot h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-        <span className="text-foreground font-bold">UNIT 300 · REFINERY OPERATIONS</span>
-      </span>
-      <span className="text-border">│</span>
-      <span>Env: <span className="text-foreground font-medium">Production</span></span>
-      <span className="text-border">│</span>
-      <span>Graph Engine: <span className="text-primary font-bold">Neo4j + pgvector</span></span>
-      <span className="text-border">│</span>
-      <Link to="/alerts" className="inline-flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-        <Radio className="h-3.5 w-3.5 text-amber-500" aria-hidden />
-        <span className="text-amber-700 font-bold">{activeAlertsCount} Active Alerts</span>
-      </Link>
-      <span className="ml-auto font-mono text-[11px] tabular-nums text-muted-foreground">
+    <div className="flex items-center justify-between border-b border-border/40 bg-white/40 px-8 py-2 font-sans text-xs font-bold text-muted-foreground backdrop-blur-sm">
+      <span className="text-foreground font-extrabold tracking-tight text-sm">Mhmm.ai</span>
+      <span className="font-mono text-xs tabular-nums text-foreground font-bold">
         {utcTime ? `UTC ${utcTime}` : ""}
       </span>
     </div>
@@ -310,13 +301,10 @@ export function AppShell() {
 
         <footer className="border-t border-border/40 px-6 py-4 text-xs font-semibold text-muted-foreground sm:px-8">
           <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-3">
-            <span>© {year || ""} Mhmm.ai · Industrial Knowledge Intelligence Platform</span>
-            <span className="flex items-center gap-4">
-              <span>System v4.2 · Stitch Lavender Theme</span>
-              <span className="inline-flex items-center gap-1.5 text-emerald-600 font-bold">
-                <span className="live-dot h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-                <span>Uplink Nominal</span>
-              </span>
+            <span>© {year || "2026"} Mhmm.ai · Industrial Knowledge Intelligence Platform</span>
+            <span className="inline-flex items-center gap-1.5 text-emerald-600 font-bold">
+              <span className="live-dot h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
+              <span>Online</span>
             </span>
           </div>
         </footer>

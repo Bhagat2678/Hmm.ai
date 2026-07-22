@@ -10,12 +10,14 @@ def create_document(
     filename: str,
     document_type: Optional[str] = None,
     uploaded_by: Optional[str] = None,
+    file_size: Optional[int] = None,
     status: str = "pending",
 ) -> Document:
     doc = Document(
         filename=filename,
         document_type=document_type,
         uploaded_by=uploaded_by,
+        file_size=file_size,
         status=status,
         uploaded_at=datetime.now(timezone.utc),
     )

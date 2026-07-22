@@ -15,6 +15,7 @@ function LoginPage() {
   const router = useRouter();
   const [username, setUsername] = useState("demo");
   const [password, setPassword] = useState("demo");
+  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -24,7 +25,7 @@ function LoginPage() {
     try {
       const response = await api.post("/auth/login", { username, password });
       if (response.data.access_token) {
-        login(response.data.access_token);
+        login(response.data.access_token, rememberMe);
         toast.success("Authentication successful");
 
         setTimeout(() => {
@@ -111,6 +112,18 @@ function LoginPage() {
                 />
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center justify-between text-xs pt-1">
+            <label className="flex items-center gap-2 cursor-pointer font-semibold text-muted-foreground hover:text-foreground">
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded border-primary/30 text-primary focus:ring-primary/20 cursor-pointer"
+              />
+              Remember me
+            </label>
           </div>
 
           <div className="pt-2">
