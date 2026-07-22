@@ -163,18 +163,6 @@ docker ps
 
 ---
 
-## 🎥 Video Demo Script & Verification Guide
-
-For hackathon presentation recording:
-
-1. **[0:00 - 0:30] Introduction**: Open the landing/login view featuring the Bedrock logo and single sign-on interface.
-2. **[0:30 - 1:30] Ingestion Demo**: Navigate to **Ingestion**, drag-and-drop `sample_sop_301.txt`, and watch entity extraction populate document chunks.
-3. **[1:30 - 2:30] Knowledge Graph Exploration**: Click **Knowledge Graph**, view color-coded equipment (`P-101`), sensors (`TT-301` in green), and document nodes (`sample_sop_301.txt` in slate-gray).
-4. **[2:30 - 3:30] Hybrid RAG Query**: Open **Cosmic Intelligence**, query *"What is the operating procedure for thermal transmitter TT-301?"*, and review the citation-backed answer.
-5. **[3:30 - 4:00] Failure Alerts**: Open **Alerts** (`/alerts`) to showcase the high-severity alert for temperature anomaly on `TT-301`.
-
----
-
 ## 🛡️ License
 
-Built for Hackathon Demonstration. Distributed under the MIT License.
+Built for hackathon demonstration.

@@ -147,4 +147,4 @@ VITE_API_BASE_URL=http://<host-ip>:8000/api
 ---
 
 ## 📄 License
-Licensed under the [MIT License](./LICENSE).
+Built for hackathon demonstration.
