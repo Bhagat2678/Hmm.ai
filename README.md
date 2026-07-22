@@ -1,6 +1,8 @@
-# 🏭 Bedrock — Industrial Knowledge Intelligence Platform
+# 🛡️ Bedrock — Industrial Knowledge Intelligence Platform
 
 An AI-powered operational intelligence platform for ingesting, processing, and querying complex industrial engineering knowledge using Retrieval-Augmented Generation (RAG), pgvector vector search, and graph databases.
+
+> 📖 **Complete Architecture & Submission Documentation**: See [DOCUMENTATION.md](./DOCUMENTATION.md) for full technical deep-dive, API reference, and demo walkthrough.
 
 ---
 
