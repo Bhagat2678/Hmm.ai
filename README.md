@@ -46,17 +46,17 @@ flowchart TD
 
 ## 🚀 Quick Start Instructions
 
-Getting Mhmm.ai running on your local machine requires **2 commands**.
+Mhmm.ai supports a **Native Development Workflow** (no Docker required for day-to-day work, using Supabase PostgreSQL + Neo4j AuraDB cloud backends) as well as an optional Docker workflow.
 
 ### Prerequisites
-- [Docker & Docker Compose](https://docs.docker.com/get-docker/) (v20.10+)
-- [Python 3.10+](https://www.python.org/downloads/) (Optional for local development)
-- [Node.js 18+](https://nodejs.org/) (Optional for local frontend)
+- [Python 3.10+](https://www.python.org/downloads/)
+- [Node.js 18+](https://nodejs.org/)
+- [Docker & Docker Compose](https://docs.docker.com/get-docker/) (Optional for containerized deployments)
 
 ---
 
-### Step 1: Environment Setup
-Run the setup script to initialize environment configurations, Python virtual environment, and Node dependencies:
+### Step 1: Environment & Dependency Setup
+Run the setup script to initialize environment configurations, Python virtual environment, dependencies, and verify cloud database/AI API connections:
 
 ```bash
 # Linux / macOS
@@ -65,8 +65,8 @@ bash scripts/setup.sh
 
 ---
 
-### Step 2: Launch Platform
-Start all containerized services (PostgreSQL + pgvector, FastAPI Backend, React Frontend):
+### Step 2: Launch Platform (Native Default)
+Start the FastAPI backend service and Vite React frontend natively:
 
 ```bash
 # Linux / macOS
@@ -83,6 +83,15 @@ Once running, access the platform endpoints:
 | **Frontend Workspace** | [http://localhost:5173](http://localhost:5173) | Interactive Operator Portal & Knowledge Graph Canvas |
 | **Backend REST API** | [http://localhost:8000](http://localhost:8000) | FastAPI REST Service |
 | **OpenAPI Documentation** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interactive Swagger UI API Docs |
+
+---
+
+### 🐳 Optional Docker Workflow
+For containerized testing or deployment, you can optionally run:
+
+```bash
+docker compose up -d
+```
 
 ---
 

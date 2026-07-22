@@ -1,36 +1,39 @@
+# ==============================================================================
+# Mhmm.ai Native Development Startup Script for Windows (PowerShell)
+# ==============================================================================
+
 $ErrorActionPreference = "Stop"
 
-Write-Host "[INFO] Starting Mhmm.ai development environment..." -ForegroundColor Cyan
+Write-Host "[INFO] Starting Mhmm.ai Platform Natively..." -ForegroundColor Cyan
 
-# 1. Check Docker CLI
-if (-not (Get-Command "docker" -ErrorAction SilentlyContinue)) {
-    Write-Error "Docker could not be found. Please install Docker Desktop."
-    exit 1
+$ScriptDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
+$RootDir = Split-Path -Path $ScriptDir -Parent
+Set-Location $RootDir
+
+# Activate virtual environment if available
+if (Test-Path ".venv\Scripts\Activate.ps1") {
+    Write-Host "[INFO] Activating virtual environment..." -ForegroundColor Green
+    & ".venv\Scripts\Activate.ps1"
 }
 
-# 2. Check .env files
-if (-not (Test-Path ".env")) {
-    if (Test-Path ".env.example") {
-        Write-Host "[INFO] Creating .env from .env.example..." -ForegroundColor Yellow
-        Copy-Item ".env.example" ".env"
-    }
+Write-Host "[INFO] Starting FastAPI Backend on http://localhost:8000..." -ForegroundColor Green
+$env:PYTHONPATH = "$RootDir;$RootDir\backend"
+$BackendJob = Start-Job -ScriptBlock {
+    Set-Location "$using:RootDir\backend"
+    python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 }
 
-if (-not (Test-Path "backend/.env")) {
-    if (Test-Path ".env.example") {
-        Write-Host "[INFO] Creating backend/.env from .env.example..." -ForegroundColor Yellow
-        Copy-Item ".env.example" "backend/.env"
-    }
-}
+Start-Sleep -Seconds 3
 
-# 3. Bring up Docker services
-Write-Host "[INFO] Bringing up Docker Compose services (postgres, backend, frontend)..." -ForegroundColor Cyan
-docker compose up -d
+Write-Host "[INFO] Starting Frontend Dev Server on http://localhost:5173..." -ForegroundColor Green
+Set-Location "$RootDir\frontend"
 
 Write-Host "====================================================" -ForegroundColor Cyan
-Write-Host "🚀 Mhmm.ai Development Platform is Running!" -ForegroundColor Green
+Write-Host "🚀 Mhmm.ai Platform Running Natively!" -ForegroundColor Green
 Write-Host "====================================================" -ForegroundColor Cyan
 Write-Host "📡 Backend API:         http://localhost:8000" -ForegroundColor White
 Write-Host "📖 API OpenAPI Docs:     http://localhost:8000/docs" -ForegroundColor White
 Write-Host "🎨 Frontend Workspace:   http://localhost:5173" -ForegroundColor White
 Write-Host "====================================================" -ForegroundColor Cyan
+
+npm run dev

@@ -53,28 +53,55 @@ const SUGGESTED = [
   "Compare vibration limits for P-101 vs API 670.",
 ];
 
+interface ChatMessage {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  citations?: any[];
+  confidence?: number;
+  error?: boolean;
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  timestamp: Date;
+  messages: ChatMessage[];
+  citations: any[];
+}
+
 function QueryPage() {
   const { q: urlQuery, reset: urlReset } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const [input, setInput] = useState(urlQuery || "");
   const { mutate: submitQuery, isPending } = useKnowledgeQuery();
-  const [conversation, setConversation] = useState<
+
+  const [sessions, setSessions] = useState<ChatSession[]>([
     {
-      id: string;
-      role: "user" | "assistant";
-      text: string;
-      citations?: any[];
-      confidence?: number;
-      error?: boolean;
-    }[]
-  >([]);
-  const [activeCitations, setActiveCitations] = useState<any[]>([]);
+      id: "initial-session",
+      title: "Current Chat",
+      timestamp: new Date(),
+      messages: [],
+      citations: [],
+    },
+  ]);
+  const [activeSessionId, setActiveSessionId] = useState<string>("initial-session");
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const activeSession = sessions.find((s) => s.id === activeSessionId) || sessions[0];
+  const conversation = activeSession.messages;
 
   useEffect(() => {
     if (urlReset) {
-      setConversation([]);
-      setActiveCitations([]);
+      setSessions([
+        {
+          id: crypto.randomUUID(),
+          title: "New Chat",
+          timestamp: new Date(),
+          messages: [],
+          citations: [],
+        },
+      ]);
       setInput("");
       navigate({ search: (prev) => ({ ...prev, reset: undefined }), replace: true });
     }
@@ -91,6 +118,23 @@ function QueryPage() {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation]);
 
+  const createNewChat = () => {
+    if (activeSession.messages.length === 0) {
+      return; // Already on an empty new chat session
+    }
+    const newSessionId = crypto.randomUUID();
+    const newSession: ChatSession = {
+      id: newSessionId,
+      title: "New Chat",
+      timestamp: new Date(),
+      messages: [],
+      citations: [],
+    };
+    setSessions((prev) => [newSession, ...prev]);
+    setActiveSessionId(newSessionId);
+    setInput("");
+  };
+
   const send = (queryOverride?: string) => {
     const queryText = (queryOverride || input).trim();
     if (!queryText || isPending) return;
@@ -98,34 +142,63 @@ function QueryPage() {
     const userMsgId = crypto.randomUUID();
     const asstMsgId = crypto.randomUUID();
 
-    setConversation((c) => [
-      ...c,
-      { id: userMsgId, role: "user", text: queryText },
-      { id: asstMsgId, role: "assistant", text: "...", citations: [], confidence: 0 },
-    ]);
+    const isFirstMessage = activeSession.messages.length === 0;
+    const newTitle = isFirstMessage
+      ? queryText.length > 28
+        ? queryText.slice(0, 28) + "..."
+        : queryText
+      : activeSession.title;
+
+    setSessions((prev) =>
+      prev.map((s) =>
+        s.id === activeSessionId
+          ? {
+              ...s,
+              title: newTitle,
+              messages: [
+                ...s.messages,
+                { id: userMsgId, role: "user", text: queryText },
+                { id: asstMsgId, role: "assistant", text: "...", citations: [], confidence: 0 },
+              ],
+            }
+          : s,
+      ),
+    );
     setInput("");
 
     submitQuery(
-      { query: queryText, conversation_id: "default", filters: {} },
+      { query: queryText, conversation_id: activeSessionId, filters: {} },
       {
         onSuccess: (data) => {
-          setConversation((c) =>
-            c.map((msg) =>
-              msg.id === asstMsgId
-                ? { ...msg, text: data.answer, citations: data.sources, confidence: data.confidence }
-                : msg,
+          setSessions((prev) =>
+            prev.map((s) =>
+              s.id === activeSessionId
+                ? {
+                    ...s,
+                    citations: data.sources && data.sources.length > 0 ? data.sources : s.citations,
+                    messages: s.messages.map((msg) =>
+                      msg.id === asstMsgId
+                        ? { ...msg, text: data.answer, citations: data.sources, confidence: data.confidence }
+                        : msg,
+                    ),
+                  }
+                : s,
             ),
           );
-          if (data.sources && data.sources.length > 0) {
-            setActiveCitations(data.sources);
-          }
         },
         onError: () => {
-          setConversation((c) =>
-            c.map((msg) =>
-              msg.id === asstMsgId
-                ? { ...msg, text: "Failed to get response. Please try again.", error: true }
-                : msg,
+          setSessions((prev) =>
+            prev.map((s) =>
+              s.id === activeSessionId
+                ? {
+                    ...s,
+                    messages: s.messages.map((msg) =>
+                      msg.id === asstMsgId
+                        ? { ...msg, text: "Failed to generate response. Please try again.", error: true }
+                        : msg,
+                    ),
+                  }
+                : s,
             ),
           );
         },
@@ -133,8 +206,7 @@ function QueryPage() {
     );
   };
 
-  const userQueries = conversation.filter((m) => m.role === "user");
-  const currentCitations = activeCitations;
+  const currentCitations = activeSession.citations;
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[250px_minmax(0,1fr)_300px] h-[calc(100vh-140px)] min-h-[600px]">
@@ -148,38 +220,32 @@ function QueryPage() {
             <p className="text-xs font-bold text-foreground">Conversations</p>
           </div>
           <button
-            onClick={() => {
-              setConversation([]);
-              setActiveCitations([]);
-            }}
+            onClick={createNewChat}
             className="rounded-xl bg-primary px-3 py-1 text-[11px] font-bold text-white hover:brightness-110 transition-all inline-flex items-center gap-1 cursor-pointer"
           >
             <Plus className="h-3 w-3" /> New
           </button>
         </div>
         <ul className="flex-1 divide-y divide-border/40 overflow-y-auto">
-          {userQueries.length === 0 ? (
-            <li className="p-4 text-center text-xs text-muted-foreground">
-              No queries yet in this session.
+          {sessions.map((sess) => (
+            <li key={sess.id}>
+              <button
+                onClick={() => setActiveSessionId(sess.id)}
+                className={cn(
+                  "flex w-full items-start gap-2.5 px-4 py-3 text-left transition-all hover:bg-primary/5 cursor-pointer",
+                  sess.id === activeSessionId && "bg-primary/10 border-l-4 border-primary font-bold",
+                )}
+              >
+                <ChevronRight className={cn("mt-0.5 h-3.5 w-3.5 shrink-0", sess.id === activeSessionId ? "text-primary" : "text-muted-foreground")} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-xs font-semibold text-foreground">{sess.title}</p>
+                  <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
+                    <Clock className="h-2.5 w-2.5" /> {sess.messages.length} messages
+                  </p>
+                </div>
+              </button>
             </li>
-          ) : (
-            userQueries.map((u, i) => (
-              <li key={u.id}>
-                <button
-                  onClick={() => send(u.text)}
-                  className="flex w-full items-start gap-2.5 px-4 py-3 text-left transition-all hover:bg-primary/5 cursor-pointer"
-                >
-                  <ChevronRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-semibold text-foreground">{u.text}</p>
-                    <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground">
-                      <Clock className="h-2.5 w-2.5" /> Session Query #{i + 1}
-                    </p>
-                  </div>
-                </button>
-              </li>
-            ))
-          )}
+          ))}
         </ul>
 
         {/* Suggested Queries */}
@@ -202,7 +268,7 @@ function QueryPage() {
         </div>
       </aside>
 
-      {/* Center Chat Area (1:1 Stitch Layout) */}
+      {/* Center Chat Area */}
       <section className="flex flex-col glass-panel rounded-3xl overflow-hidden min-h-0">
         {/* Chat Header */}
         <header className="flex items-center justify-between border-b border-border/50 px-6 py-3.5 bg-white/50 backdrop-blur-md">
@@ -214,28 +280,19 @@ function QueryPage() {
               <h2 className="text-sm font-bold text-foreground">Cosmic Knowledge Assistant</h2>
               <p className="text-[10px] font-bold text-muted-foreground inline-flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 live-dot" />
-                Gemini 2.5 Flash · Groq RAG
+                Gemini 2.5 Flash · Groq RAG Engine
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
-                navigator.clipboard.writeText(window.location.href);
-                toast.success("Query link copied to clipboard");
-              }}
-              title="Share Query"
-              className="p-2 rounded-xl text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer"
-            >
-              <Share2 className="h-4 w-4" />
-            </button>
-            <button
-              onClick={() => {
-                setConversation([]);
-                setActiveCitations([]);
+                setSessions((prev) =>
+                  prev.map((s) => (s.id === activeSessionId ? { ...s, messages: [], citations: [] } : s)),
+                );
               }}
               className="p-2 rounded-xl text-muted-foreground hover:bg-red-100 hover:text-red-600 transition-colors cursor-pointer"
-              title="Clear session"
+              title="Clear active chat"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -306,7 +363,7 @@ function QueryPage() {
         </div>
       </section>
 
-      {/* Right Sidebar: System Processes & Clarity Index Gauge (1:1 Stitch Style) */}
+      {/* Right Sidebar: System Processes */}
       <aside className="hidden lg:flex flex-col glass-panel rounded-3xl p-5 space-y-5 overflow-hidden">
         <div>
           <h3 className="font-bold text-sm text-primary">System Processes</h3>
@@ -378,12 +435,6 @@ function QueryPage() {
             </ul>
           )}
         </div>
-
-        {/* Code Inspection CTA */}
-        <button className="w-full py-3 border-2 border-primary/30 border-dashed rounded-2xl text-primary font-bold text-xs hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 cursor-pointer">
-          <Terminal className="h-4 w-4" />
-          Inspect RAG Context
-        </button>
       </aside>
     </div>
   );

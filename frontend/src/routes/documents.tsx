@@ -183,6 +183,19 @@ function DocumentsPage() {
               <Rows3 className="h-4 w-4" />
             </button>
           </div>
+
+          {displayDocs.some((d: any) => d.status === "failed") && (
+            <button
+              onClick={() => {
+                const failedDocs = displayDocs.filter((d: any) => d.status === "failed");
+                failedDocs.forEach((d: any) => deleteDocument(d.id));
+                toast.success(`Deleted ${failedDocs.length} failed document(s).`);
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-200 transition-all cursor-pointer shadow-xs"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Delete Failed Imports
+            </button>
+          )}
         </div>
       </header>
 
@@ -202,7 +215,7 @@ function DocumentsPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Neural Synthetics */}
+          {/* Knowledge Workspace */}
           <div
             onClick={() => setCategory("All")}
             className="glass-card rounded-2xl p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden transition-all duration-300 hover:-translate-y-1"
@@ -216,19 +229,8 @@ function DocumentsPage() {
               </span>
             </div>
             <div className="mt-4">
-              <h3 className="text-base font-bold text-foreground">Neural Synthetics</h3>
-              <p className="text-xs text-muted-foreground">RAG Vector Index · Unit 300</p>
-            </div>
-            <div className="flex -space-x-2 mt-4">
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-primary/20 flex items-center justify-center text-xs font-bold text-primary">
-                P
-              </div>
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-emerald-100 flex items-center justify-center text-xs font-bold text-emerald-700">
-                V
-              </div>
-              <div className="w-8 h-8 rounded-full border-2 border-white bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700">
-                HX
-              </div>
+              <h3 className="text-base font-bold text-foreground">Knowledge Workspace</h3>
+              <p className="text-xs text-muted-foreground">RAG Vector Index & Engineering Knowledge Base</p>
             </div>
           </div>
 
@@ -443,41 +445,6 @@ function DocumentsPage() {
           </div>
         </div>
       )}
-
-      {/* Sticky Neural Training Progress Footer (1:1 Stitch Style) */}
-      <div className="fixed bottom-4 left-64 right-6 glass-panel rounded-3xl p-5 flex flex-col md:flex-row items-center gap-6 border border-primary/30 bg-white/90 backdrop-blur-2xl shadow-2xl z-40">
-        <div className="flex items-center gap-4 shrink-0">
-          <div className="w-10 h-10 rounded-full border-3 border-primary border-t-transparent animate-spin" />
-          <div>
-            <h5 className="font-bold text-xs text-foreground">Neural Ingestion Pipeline</h5>
-            <p className="text-[11px] text-muted-foreground font-medium">
-              Synthesizing Protocol v3.8 · {progress.toFixed(0)}% Complete
-            </p>
-          </div>
-        </div>
-        <div className="flex-1 w-full bg-primary/10 rounded-full h-2.5 overflow-hidden">
-          <div
-            className="bg-primary h-full rounded-full transition-all duration-500 shadow-md shadow-primary/30"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            className="px-4 py-2 bg-white border border-primary/40 text-primary rounded-xl text-xs font-bold hover:bg-primary hover:text-white transition-all shadow-xs cursor-pointer inline-flex items-center gap-1.5"
-          >
-            <Pause className="h-3.5 w-3.5" />
-            {isPaused ? "Resume" : "Pause"}
-          </button>
-          <button
-            onClick={() => setProgress(100)}
-            className="p-2 text-muted-foreground hover:text-red-600 transition-colors cursor-pointer"
-            title="Complete processing"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
 
       {/* Slide-over Detail Drawer */}
       {selected && (

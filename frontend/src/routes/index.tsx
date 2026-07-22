@@ -218,34 +218,23 @@ function DashboardPage() {
         })}
       </section>
 
-      {/* Graph Preview + Alerts */}
+      {/* Knowledge Graph Preview + Alerts */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <KnowledgeGraphPreview stats={stats} />
         <AlertsPanel alerts={alerts || []} />
       </section>
 
-      {/* AI Insights + Pipeline */}
+      {/* AI Insights + Process Telemetry */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <AiInsightsPanel />
-        <PipelineStatus />
-      </section>
-
-      {/* Recent Uploads + Telemetry */}
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <RecentUploads documents={documents || []} />
         <ProcessTelemetry stats={stats} />
       </section>
 
-      {/* System Health + Graph Stats + Recent Queries */}
+      {/* System Health + Graph Stats + Recent Uploads */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <SystemHealth />
         <GraphStatistics stats={stats} />
-        <RecentQueries />
-      </section>
-
-      {/* AI Activity Timeline */}
-      <section>
-        <AiActivityTimeline />
+        <RecentUploads documents={documents || []} />
       </section>
     </div>
   );
@@ -589,55 +578,83 @@ function KnowledgeGraphPreview({ stats }: { stats?: any }) {
   const hasNodes = (stats?.graph_nodes ?? 0) > 0;
 
   return (
-    <GlassCard className="col-span-1 lg:col-span-2">
-      <CardHeader
-        icon={Network}
-        title="Knowledge Graph Preview"
-        badge={
-          <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
-            {hasNodes ? `${stats.graph_nodes} nodes` : "0 nodes"}
-          </span>
-        }
-        action={
-          <Link
-            to="/graph"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
-          >
-            Open explorer <ArrowUpRight className="h-3 w-3" aria-hidden />
-          </Link>
-        }
-      />
-      <div className="relative bg-gradient-to-br from-primary/5 to-transparent h-[280px] flex items-center justify-center">
-        {!hasNodes ? (
-          <div className="text-center p-6 space-y-2">
-            <Network className="h-8 w-8 mx-auto text-muted-foreground/50" />
-            <p className="text-xs font-semibold text-foreground">Knowledge Graph Empty</p>
-            <p className="text-[11px] text-muted-foreground max-w-xs">
-              Ingest engineering manuals or SOPs to automatically extract entities and relationships.
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center p-6 space-y-4 text-center">
-            <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">
-                <Network className="h-5 w-5" />
-              </span>
-              <div className="text-left">
-                <p className="text-sm font-bold text-foreground">{stats.graph_nodes} Active Graph Nodes</p>
-                <p className="text-xs text-muted-foreground">{stats.graph_edges || 0} Relationships mapped in Neo4j AuraDB</p>
+    <Link to="/graph" className="group block col-span-1 lg:col-span-2 cursor-pointer">
+      <GlassCard className="h-full transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-lg">
+        <CardHeader
+          icon={Network}
+          title="Knowledge Graph Preview"
+          badge={
+            <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">
+              {hasNodes ? `${stats.graph_nodes} nodes` : "0 nodes"}
+            </span>
+          }
+          action={
+            <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:translate-x-0.5 transition-transform">
+              Open explorer <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
+            </span>
+          }
+        />
+        <div className="relative bg-gradient-to-br from-primary/5 via-white/20 to-primary/5 h-[280px] flex items-center justify-center overflow-hidden p-4">
+          {!hasNodes ? (
+            <div className="text-center p-6 space-y-2">
+              <Network className="h-8 w-8 mx-auto text-muted-foreground/50" />
+              <p className="text-xs font-semibold text-foreground">Knowledge Graph Empty</p>
+              <p className="text-[11px] text-muted-foreground max-w-xs">
+                Ingest engineering manuals or SOPs to automatically extract entities and relationships.
+              </p>
+            </div>
+          ) : (
+            <div className="relative w-full h-full flex flex-col items-center justify-between">
+              {/* Mini Interactive SVG Visual Nodes */}
+              <svg className="w-full h-[200px] pointer-events-none" viewBox="0 0 400 200">
+                {/* Edges */}
+                <line x1="80" y1="100" x2="200" y2="60" stroke="#6b4c9b" strokeWidth="2" strokeOpacity="0.25" strokeDasharray="4 4" />
+                <line x1="200" y1="60" x2="320" y2="100" stroke="#6b4c9b" strokeWidth="2" strokeOpacity="0.25" />
+                <line x1="200" y1="60" x2="200" y2="150" stroke="#16a34a" strokeWidth="2" strokeOpacity="0.25" />
+                <line x1="80" y1="100" x2="200" y2="150" stroke="#d97706" strokeWidth="2" strokeOpacity="0.2" />
+
+                {/* Node P-101 */}
+                <g transform="translate(80, 100)">
+                  <circle r="22" fill="#6b4c9b" fillOpacity="0.15" />
+                  <circle r="14" fill="#6b4c9b" />
+                  <text y="26" textAnchor="middle" fill="#1e1b4b" fontSize="10" fontWeight="bold">P-101</text>
+                </g>
+
+                {/* Node V-204 */}
+                <g transform="translate(200, 60)">
+                  <circle r="26" fill="#8565b6" fillOpacity="0.15" />
+                  <circle r="16" fill="#8565b6" />
+                  <text y="28" textAnchor="middle" fill="#1e1b4b" fontSize="10" fontWeight="bold">V-204</text>
+                </g>
+
+                {/* Node HX-31 */}
+                <g transform="translate(320, 100)">
+                  <circle r="22" fill="#d97706" fillOpacity="0.15" />
+                  <circle r="14" fill="#d97706" />
+                  <text y="26" textAnchor="middle" fill="#1e1b4b" fontSize="10" fontWeight="bold">HX-31</text>
+                </g>
+
+                {/* Node TT-101 */}
+                <g transform="translate(200, 150)">
+                  <circle r="20" fill="#16a34a" fillOpacity="0.15" />
+                  <circle r="12" fill="#16a34a" />
+                  <text y="24" textAnchor="middle" fill="#1e1b4b" fontSize="10" fontWeight="bold">TT-101</text>
+                </g>
+              </svg>
+
+              <div className="w-full flex items-center justify-between px-4 pb-2 border-t border-border/30 text-xs">
+                <span className="font-bold text-foreground">
+                  {stats.graph_nodes} Active Nodes · {stats.graph_edges || 0} Edges
+                </span>
+                <span className="text-[11px] font-bold text-primary group-hover:underline">
+                  Click to Explore Graph Canvas &rarr;
+                </span>
               </div>
             </div>
-            <Link
-              to="/graph"
-              className="inline-flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/20 transition-all"
-            >
-              <GitBranch className="h-3.5 w-3.5" />
-              Explore Knowledge Graph Canvas
-            </Link>
-          </div>
-        )}
-      </div>
-    </GlassCard>
+          )}
+        </div>
+      </GlassCard>
+    </Link>
   );
 }
 

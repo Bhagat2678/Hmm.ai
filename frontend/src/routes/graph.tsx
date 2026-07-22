@@ -178,6 +178,27 @@ function GraphPage() {
     }
   }, [graphData, activeKinds]);
 
+  // Center and highlight node when searching
+  useEffect(() => {
+    if (!searchQuery.trim() || visibleNodes.length === 0) return;
+    const q = searchQuery.toLowerCase().trim();
+    const match = visibleNodes.find((n) => {
+      const idText = (n.id || "").toLowerCase();
+      const labelText = (n.label || "").toLowerCase();
+      const nameText = (n.properties?.name || "").toLowerCase();
+      const fileText = (n.properties?.filename || "").toLowerCase();
+      return idText.includes(q) || labelText.includes(q) || nameText.includes(q) || fileText.includes(q);
+    });
+
+    if (match) {
+      setSelectedId(match.id);
+      if (fgRef.current && typeof match.x === "number" && typeof match.y === "number") {
+        fgRef.current.centerAt(match.x, match.y, 400);
+        fgRef.current.zoom(2.5, 400);
+      }
+    }
+  }, [searchQuery, visibleNodes]);
+
   return (
     <div className="space-y-6">
       {/* Hero Header */}

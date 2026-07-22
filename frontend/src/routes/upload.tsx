@@ -14,6 +14,7 @@ import {
   GitBranch,
   Cpu,
   RotateCw,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUpload } from "../hooks/useUpload";
@@ -95,7 +96,7 @@ function UploadPage() {
   };
 
   const QUEUE = documents.filter((d) => ["pending", "processing", "failed"].includes(d.status));
-  const HISTORY = documents.filter((d) => d.status === "ingested").slice(0, 5);
+  const HISTORY = documents.filter((d) => ["ingested", "completed"].includes(d.status)).slice(0, 10);
 
   return (
     <div className="space-y-8">
@@ -308,23 +309,33 @@ function UploadPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {f.status === "failed" && (
+                  {f.status === "failed" ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => retryUpload(f.id)}
+                        className="inline-flex items-center gap-1 rounded-xl bg-primary/10 px-3 py-1 text-xs font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+                      >
+                        <RotateCw className="h-3 w-3" /> Retry
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => cancelUpload(f.id)}
+                        className="inline-flex items-center gap-1 rounded-xl bg-red-100 px-3 py-1 text-xs font-bold text-red-600 hover:bg-red-200 transition-colors cursor-pointer"
+                      >
+                        <Trash2 className="h-3 w-3" /> Delete
+                      </button>
+                    </>
+                  ) : (
                     <button
                       type="button"
-                      onClick={() => retryUpload(f.id)}
-                      className="inline-flex items-center gap-1 rounded-xl bg-primary/10 px-3 py-1 text-xs font-bold text-primary hover:bg-primary/20 transition-colors cursor-pointer"
+                      onClick={() => cancelUpload(f.id)}
+                      aria-label="Cancel upload"
+                      className="grid h-8 w-8 place-items-center rounded-xl text-muted-foreground hover:bg-red-100 hover:text-red-600 transition-colors cursor-pointer"
                     >
-                      <RotateCw className="h-3 w-3" /> Retry
+                      <X className="h-4 w-4" aria-hidden />
                     </button>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => cancelUpload(f.id)}
-                    aria-label="Cancel upload"
-                    className="grid h-8 w-8 place-items-center rounded-xl text-muted-foreground hover:bg-red-100 hover:text-red-600 transition-colors cursor-pointer"
-                  >
-                    <X className="h-4 w-4" aria-hidden />
-                  </button>
                 </div>
               </li>
             );
