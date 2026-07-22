@@ -80,24 +80,24 @@ Ensure your `.env` is configured with database and API keys:
 
 ```env
 # PostgreSQL Database (Supabase IPv4 Pooler)
-DATABASE_URL=postgresql://postgres.beymztuvwxfkofmfjkfb:DatabaseMhmmai@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
+DATABASE_URL=postgresql://postgres.<project_ref>:<password>@aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres
 
 # Supabase Platform
-SUPABASE_URL=https://beymztuvwxfkofmfjkfb.supabase.co
-SUPABASE_KEY=sb_publishable_JNUlDlmBlHVnwX1LeZ6iCQ_8uamMoNt
-SUPABASE_DATABASE_URL=postgresql://postgres:DatabaseMhmmai@db.beymztuvwxfkofmfjkfb.supabase.co:5432/postgres
+SUPABASE_URL=https://<your-project-ref>.supabase.co
+SUPABASE_KEY=your_supabase_anon_key
+SUPABASE_DATABASE_URL=postgresql://postgres:<password>@db.<your-project-ref>.supabase.co:5432/postgres
 
 # Neo4j Graph Database
-NEO4J_URI=neo4j+s://7fe11bca.databases.neo4j.io
-NEO4J_USERNAME=7fe11bca
-NEO4J_PASSWORD=IatWX9suddZxn3cUKWXpIKL05QQ9g0sFCDg3hmXczrs
+NEO4J_URI=neo4j+s://<your-aura-db-id>.databases.neo4j.io
+NEO4J_USERNAME=neo4j
+NEO4J_PASSWORD=your_neo4j_password
 
 # AI / LLM APIs
-GEMINI_API_KEY=yAQ.Ab8RN6K_eCdsEhxV9FC30TgAc5YZW1Z3I4Ewn8lEgdmEzckjNQ
-GROQ_API_KEY=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
+GEMINI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key
 
 # Auth & Frontend
-JWT_SECRET=default_hackathon_jwt_secret_key_change_me
+JWT_SECRET=your_jwt_secret_key
 VITE_API_BASE_URL=http://<host-ip>:8000/api
 ```
 
