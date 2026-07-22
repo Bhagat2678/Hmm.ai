@@ -78,7 +78,6 @@ def get_platform_stats(db: Session = Depends(get_db)):
             for node_id, data in neo4j_client.memory_graph.nodes(data=True):
                 label = data.get("label", "").lower()
                 props = data.get("properties", {})
-                p_type = str(props.get("type", "")).lower()
                 n_id_upper = str(node_id).upper()
 
                 if label in ("equipment", "pump", "compressor", "valve", "exchanger", "vessel", "tank") or any(n_id_upper.startswith(prefix) for prefix in ("P-", "V-", "HX-", "C-", "T-")):
