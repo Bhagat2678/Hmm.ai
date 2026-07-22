@@ -37,23 +37,23 @@ export const Route = createFileRoute("/graph")({
 });
 
 const NODE_TYPES = [
-  { key: "equipment", label: "Equipment", color: "#6b4c9b", icon: Gauge },
-  { key: "sensor", label: "Sensors", color: "#16a34a", icon: GitBranch },
-  { key: "document", label: "Documents", color: "#71547c", icon: FileText },
-  { key: "procedure", label: "Procedures", color: "#d97706", icon: ClipboardList },
-  { key: "failure", label: "Failures", color: "#dc2626", icon: AlertTriangle },
-  { key: "asset", label: "Assets", color: "#8565b6", icon: Boxes },
-  { key: "entity", label: "Entities", color: "#2563eb", icon: Boxes },
+  { key: "equipment", label: "Equipment", color: "#8b5cf6", icon: Gauge },   // Vibrant Violet/Purple
+  { key: "sensor", label: "Sensors", color: "#10b981", icon: GitBranch },    // Vibrant Green
+  { key: "document", label: "Documents", color: "#64748b", icon: FileText },  // Slate Gray
+  { key: "procedure", label: "Procedures", color: "#f59e0b", icon: ClipboardList }, // Orange/Amber
+  { key: "failure", label: "Failures", color: "#ef4444", icon: AlertTriangle }, // Red
+  { key: "asset", label: "Assets", color: "#3b82f6", icon: Boxes },           // Blue
+  { key: "entity", label: "Entities", color: "#6366f1", icon: Boxes },        // Indigo
 ];
 
 const KIND_COLOR: Record<string, string> = {
-  equipment: "#6b4c9b",
-  sensor: "#16a34a",
-  document: "#71547c",
-  procedure: "#d97706",
-  failure: "#dc2626",
-  asset: "#8565b6",
-  entity: "#2563eb",
+  equipment: "#8b5cf6",
+  sensor: "#10b981",
+  document: "#64748b",
+  procedure: "#f59e0b",
+  failure: "#ef4444",
+  asset: "#3b82f6",
+  entity: "#6366f1",
 };
 
 function GraphPage() {
@@ -98,7 +98,16 @@ function GraphPage() {
           nodeMap.set(n.id, {
             id: n.id,
             label: n.properties?.name || n.properties?.filename || n.properties?.title || n.label || n.id,
-            kind: (n.label || "equipment").toLowerCase(),
+            kind: (() => {
+              const label = (n.label || "equipment").toLowerCase();
+              const name = (n.properties?.name || n.properties?.tag || n.id || "").toUpperCase();
+              if (label === "equipment") {
+                if (name.startsWith("TT-") || name.startsWith("PT-") || name.startsWith("LT-") || name.startsWith("FT-") || (name.includes("SENSOR") && !name.includes("SOP-"))) {
+                  return "sensor";
+                }
+              }
+              return label;
+            })(),
             ...n,
           });
         }
@@ -384,7 +393,7 @@ function GraphPage() {
                 nodeLabel="label"
                 nodeColor={(node: any) => KIND_COLOR[node.kind] || KIND_COLOR.equipment}
                 nodeRelSize={6}
-                linkColor={() => "rgba(107, 76, 155, 0.15)"}
+                linkColor={() => "rgba(139, 92, 246, 0.15)"}
                 onNodeClick={(node: any) => setSelectedId(node.id)}
                 onBackgroundClick={() => setSelectedId("")}
                 width={800}
@@ -399,7 +408,7 @@ function GraphPage() {
                   if (isSelected) {
                     ctx.beginPath();
                     ctx.arc(node.x, node.y, radius + 4 / globalScale, 0, 2 * Math.PI, false);
-                    ctx.fillStyle = "rgba(107, 76, 155, 0.25)";
+                    ctx.fillStyle = "rgba(139, 92, 246, 0.25)";
                     ctx.fill();
                   }
 
@@ -434,7 +443,7 @@ function GraphPage() {
                   // Text fill
                   ctx.textAlign = "center";
                   ctx.textBaseline = "middle";
-                  ctx.fillStyle = isSelected ? "#6b4c9b" : "#1e1b4b";
+                  ctx.fillStyle = isSelected ? "#8b5cf6" : "#1e1b4b";
                   ctx.fillText(labelText, node.x, textY);
 
                   node.__bckgDimensions = [textWidth + 8 / globalScale, fontSize + 4 / globalScale];
