@@ -36,3 +36,4 @@ backend/uploads/*
 !backend/uploads/.gitkeep
 env
 stitch_downloads/
+*.log
