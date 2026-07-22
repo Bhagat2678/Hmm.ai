@@ -1,0 +1,27 @@
+SOP-301: EMERGENCY SHUTDOWN AND SYSTEM ISOLATION PROCEDURE
+
+Document Code: SOP-301
+Associated System: Gas Treatment Unit 400
+Primary Vessel: V-204 (Separator Vessel)
+Connected Equipment: 
+- C-301 (Reciprocating Gas Compressor)
+- P-101 (Centrifugal Feed Pump)
+Associated Instruments: 
+- TT-301 (Compressor Discharge Temp Sensor)
+- PT-301 (Compressor Discharge Pressure Sensor)
+- LT-204 (V-204 Liquid Level Transmitter)
+
+OVERVIEW:
+This protocol defines the sequence of automated actions and manual operator steps required to isolate and depressurize Separator Vessel V-204 and Gas Compressor C-301 during critical process excursions.
+
+AUTOMATED ACTION TRIGGER EVENTS:
+1. High-High Temperature: If temperature sensor TT-301 exceeds 100°C.
+2. High-High Level: If level transmitter LT-204 exceeds 80% capacity.
+3. High-High Pressure: If pressure transmitter PT-301 exceeds 45.0 bar.
+
+EMERGENCY SEQUENCE STEPS:
+Step 1: Signal trip command to isolate Reciprocating Gas Compressor C-301 immediately.
+Step 2: Signal trip command to feed pump P-101 to halt liquid inlet flow to V-204.
+Step 3: Close emergency shutdown inlet valve ESV-204 to prevent further hydrocarbon build-up.
+Step 4: Fully open blowdown depressurization valve BDV-204 to route inventory safely to the flare stack.
+Step 5: Operator must verify zero differential pressure across C-301 before entering the enclosure.

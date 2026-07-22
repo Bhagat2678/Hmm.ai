@@ -37,7 +37,7 @@ export const NAV_ITEMS: NavItem[] = [
 export function BrandMark({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <div className="flex items-center gap-3 px-2 py-2">
-      <img src="/logo-icon.png" alt="Bedrock Logo" className="h-10 w-10 shrink-0 object-contain" />
+      <img src="/logo.png" alt="Bedrock Logo" className="h-10 w-10 shrink-0 object-contain" />
       {!collapsed && (
         <div className="min-w-0 leading-tight">
           <p className="font-bold tracking-tight text-primary text-base">

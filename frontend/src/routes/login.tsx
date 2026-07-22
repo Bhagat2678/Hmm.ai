@@ -55,7 +55,7 @@ function LoginPage() {
       <div className="w-full max-w-md space-y-8 glass-panel rounded-3xl p-8 md:p-10 shadow-2xl backdrop-blur-2xl border border-primary/20">
         <div className="text-center space-y-3">
           <div className="mx-auto h-16 w-16 flex items-center justify-center">
-            <img src="/logo-icon.png" alt="Bedrock Logo" className="h-16 w-16 object-contain" />
+            <img src="/logo.png" alt="Bedrock Logo" className="h-16 w-16 object-contain" />
           </div>
           <div className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
             <Shield className="h-3.5 w-3.5" />

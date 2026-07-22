@@ -72,7 +72,7 @@ function StatusRail() {
   return (
     <div className="flex items-center justify-between border-b border-border/40 bg-white/40 px-8 py-2 font-sans text-xs font-bold text-muted-foreground backdrop-blur-sm">
       <div className="flex items-center gap-2">
-        <img src="/logo-icon.png" alt="Bedrock Logo" className="h-5 w-5 object-contain" />
+        <img src="/logo.png" alt="Bedrock Logo" className="h-5 w-5 object-contain" />
         <span className="text-foreground font-extrabold tracking-tight text-sm">Bedrock</span>
       </div>
       <span className="font-mono text-xs tabular-nums text-foreground font-bold">
