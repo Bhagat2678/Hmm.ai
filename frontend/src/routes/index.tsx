@@ -233,7 +233,7 @@ function DashboardPage() {
       {/* Recent Uploads + Telemetry */}
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <RecentUploads documents={documents || []} />
-        <ProcessTelemetry />
+        <ProcessTelemetry stats={stats} />
       </section>
 
       {/* System Health + Graph Stats + Recent Queries */}
@@ -416,12 +416,12 @@ function PipelineStatus() {
 /* ---------- System Health ---------- */
 
 const HEALTH = [
-  { name: "Gemini Gateway", status: "operational", latency: "312 ms" },
-  { name: "Groq Inference", status: "operational", latency: "98 ms" },
-  { name: "Neo4j Cluster", status: "operational", latency: "14 ms" },
-  { name: "pgvector Index", status: "operational", latency: "8 ms" },
-  { name: "LangGraph Runner", status: "operational", latency: "120 ms" },
-  { name: "Object Storage", status: "operational", latency: "22 ms" },
+  { name: "Gemini Gateway", status: "operational", badge: "Active" },
+  { name: "Groq Inference", status: "operational", badge: "Active" },
+  { name: "Neo4j Cluster", status: "operational", badge: "Connected" },
+  { name: "pgvector Index", status: "operational", badge: "Connected" },
+  { name: "LangGraph Runner", status: "operational", badge: "Ready" },
+  { name: "Object Storage", status: "operational", badge: "Ready" },
 ];
 
 function SystemHealth() {
@@ -430,7 +430,7 @@ function SystemHealth() {
       <CardHeader
         icon={Zap}
         title="System Health"
-        action={<span className="text-xs font-semibold text-muted-foreground">6 / 6 nominal</span>}
+        action={<span className="text-xs font-semibold text-muted-foreground">Operational</span>}
       />
       <ul className="divide-y divide-border/40">
         {HEALTH.map((h) => (
@@ -445,8 +445,8 @@ function SystemHealth() {
               />
               <span className="truncate text-xs font-medium text-foreground">{h.name}</span>
             </div>
-            <span className="font-mono text-[11px] tabular-nums text-muted-foreground ml-2">
-              {h.latency}
+            <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-emerald-600 ml-2">
+              {h.badge}
             </span>
           </li>
         ))}
@@ -755,8 +755,13 @@ function RecentUploads({ documents }: { documents: any[] }) {
 function StatusChip({ status }: { status: string }) {
   const map: Record<string, { c: string; label: string }> = {
     indexed: { c: "bg-emerald-100 text-emerald-700 ring-emerald-200", label: "Indexed" },
+    ingested: { c: "bg-emerald-100 text-emerald-700 ring-emerald-200", label: "Ingested" },
+    completed: { c: "bg-emerald-100 text-emerald-700 ring-emerald-200", label: "Completed" },
     processing: { c: "bg-primary/10 text-primary ring-primary/20", label: "Processing" },
+    pending: { c: "bg-amber-100 text-amber-700 ring-amber-200", label: "Pending" },
     queued: { c: "bg-muted text-muted-foreground ring-border", label: "Queued" },
+    paused: { c: "bg-amber-100 text-amber-700 ring-amber-200", label: "Paused" },
+    failed: { c: "bg-red-100 text-red-700 ring-red-200", label: "Failed" },
   };
   const s = map[status] ?? map.queued;
   return (
@@ -776,30 +781,40 @@ function StatusChip({ status }: { status: string }) {
 
 /* ---------- Process Telemetry ---------- */
 
-function ProcessTelemetry() {
-  const bars = [42, 61, 58, 74, 63, 82, 71, 55, 68, 79, 88, 74, 66, 70, 78, 84, 72, 65, 60, 70];
+function ProcessTelemetry({ stats }: { stats?: any }) {
   return (
     <GlassCard>
       <CardHeader
         icon={Activity}
         title="Process Telemetry"
-        action={<span className="text-[11px] font-semibold text-muted-foreground">Ingest rate · docs/hr</span>}
+        action={<span className="text-[11px] font-semibold text-muted-foreground">Live Telemetry</span>}
       />
       <div className="p-5">
-        <div className="flex items-end justify-between gap-1 h-36">
-          {bars.map((v, i) => (
-            <div
-              key={i}
-              className="flex-1 rounded-t-md bg-primary/60 hover:bg-primary transition-all duration-200"
-              style={{ height: `${v}%` }}
-              aria-hidden
-            />
-          ))}
-        </div>
-        <div className="mt-3 flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-          <span>−20h</span>
-          <span>−10h</span>
-          <span className="text-primary font-bold">Now</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="glass-panel p-3.5 rounded-2xl text-center">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">Documents</p>
+            <p className="text-xl font-bold text-foreground mt-1 tabular-nums">
+              {stats?.documents_total ?? 0}
+            </p>
+          </div>
+          <div className="glass-panel p-3.5 rounded-2xl text-center">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">PGVector Chunks</p>
+            <p className="text-xl font-bold text-foreground mt-1 tabular-nums">
+              {stats?.chunks_total ?? 0}
+            </p>
+          </div>
+          <div className="glass-panel p-3.5 rounded-2xl text-center">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">Graph Nodes</p>
+            <p className="text-xl font-bold text-primary mt-1 tabular-nums">
+              {stats?.graph_nodes ?? 0}
+            </p>
+          </div>
+          <div className="glass-panel p-3.5 rounded-2xl text-center">
+            <p className="text-[10px] uppercase font-bold text-muted-foreground">24h AI Queries</p>
+            <p className="text-xl font-bold text-emerald-600 mt-1 tabular-nums">
+              {stats?.queries_24h ?? 0}
+            </p>
+          </div>
         </div>
       </div>
     </GlassCard>

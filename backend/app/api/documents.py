@@ -191,12 +191,50 @@ def clear_completed(db: Session = Depends(get_db)):
     create_audit_entry(db, action="clear_completed", details={"count": count})
     return {"status": "cleared", "count": count}
 
+def fetch_and_ingest_url(document_id: str, url: str, filename: str):
+    import urllib.request
+    from app.crud.document import update_document_status
+
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "MhmmAI-Ingestion-Bot/1.0"}
+        )
+        with urllib.request.urlopen(req, timeout=15) as response:
+            content = response.read()
+
+        if not content:
+            raise ValueError("Downloaded content from URL is empty.")
+
+        file_path = os.path.join(UPLOAD_DIR, f"{document_id}_{filename}")
+        with open(file_path, "wb") as f:
+            f.write(content)
+
+        process_ingestion(
+            document_id=document_id,
+            file_content=content,
+            filename=filename,
+        )
+    except Exception as e:
+        from app.db.session import SessionLocal
+        db = SessionLocal()
+        try:
+            update_document_status(db, document_id, status="failed")
+            create_audit_entry(
+                db,
+                action="document_import_url_failure",
+                details={"document_id": document_id, "url": url, "error": str(e)},
+            )
+        finally:
+            db.close()
+
+
 @router.post("/import-url")
 def import_url(url: str, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     if not url or not url.startswith(("http://", "https://")):
         raise HTTPException(status_code=400, detail="A valid HTTP(S) URL is required.")
 
-    filename = url.split("/")[-1] or "imported_document"
+    filename = url.split("/")[-1] or "imported_document.html"
     doc = create_document(
         db,
         filename=filename,
@@ -208,7 +246,14 @@ def import_url(url: str, background_tasks: BackgroundTasks, db: Session = Depend
         action="document_import_url",
         details={"document_id": str(doc.id), "url": url},
     )
-    # Note: actual URL fetching requires network access from the container.
-    # For now we create the record and mark as pending.
+
+    background_tasks.add_task(
+        fetch_and_ingest_url,
+        document_id=str(doc.id),
+        url=url,
+        filename=filename,
+    )
+
     return {"status": "queued", "document_id": str(doc.id), "filename": filename}
+
 

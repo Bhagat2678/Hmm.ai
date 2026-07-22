@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, model_validator
 class DocumentSchema(BaseModel):
     id: str
     filename: str
+    document_type: str | None = None
     upload_date: datetime
     status: str
 
@@ -18,6 +19,7 @@ class DocumentSchema(BaseModel):
             return {
                 "id": str(data.id),
                 "filename": data.filename,
+                "document_type": getattr(data, "document_type", None),
                 "upload_date": data.uploaded_at,
                 "status": data.status,
             }

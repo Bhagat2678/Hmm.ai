@@ -1,9 +1,10 @@
 export interface Document {
   id: string;
   filename: string;
+  document_type?: string;
   upload_date?: string;
   created_at?: string;
-  status: 'pending' | 'processing' | 'completed' | 'ingested' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'ingested' | 'failed' | 'paused';
 }
 
 export interface Alert {
@@ -12,6 +13,7 @@ export interface Alert {
   message: string;
   created_at: string;
   acknowledged: boolean;
+  escalated?: boolean;
 }
 
 export interface GraphNode {

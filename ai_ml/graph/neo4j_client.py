@@ -30,12 +30,40 @@ class Neo4jClient:
 
         if HAS_NEO4J and self.uri and self.password != "password":
             try:
-                self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password))
+                self.driver = GraphDatabase.driver(self.uri, auth=(self.user, self.password), connection_timeout=3.0)
                 self.driver.verify_connectivity()
                 logger.info(f"Connected to Neo4j AuraDB at '{self.uri}'")
             except Exception as e:
                 logger.warning(f"Could not connect to Neo4j AuraDB ({e}). Using NetworkX memory fallback graph.")
                 self.driver = None
+
+        self._seed_default_memory_graph()
+
+    def _seed_default_memory_graph(self):
+        if self.memory_graph is None:
+            return
+        default_nodes = [
+            ("P-101", {"label": "Equipment", "properties": {"name": "P-101", "type": "Centrifugal Pump", "status": "operational"}}),
+            ("V-204", {"label": "Equipment", "properties": {"name": "V-204", "type": "Separator Vessel", "status": "nominal"}}),
+            ("HX-31", {"label": "Equipment", "properties": {"name": "HX-31", "type": "Heat Exchanger", "status": "fouling_warning"}}),
+            ("T-500", {"label": "Equipment", "properties": {"name": "T-500", "type": "Storage Tank", "status": "nominal"}}),
+            ("FT-101", {"label": "Sensor", "properties": {"name": "FT-101", "type": "Flow Transmitter"}}),
+            ("TT-101", {"label": "Sensor", "properties": {"name": "TT-101", "type": "Temperature Transmitter"}}),
+            ("SOP-101", {"label": "Document", "properties": {"filename": "SOP-101_Pump_Maintenance.pdf", "type": "safety_procedure"}}),
+        ]
+        default_edges = [
+            ("P-101", "V-204", {"type": "CONNECTED_TO"}),
+            ("FT-101", "P-101", {"type": "MONITORS"}),
+            ("TT-101", "P-101", {"type": "MONITORS"}),
+            ("P-101", "SOP-101", {"type": "MENTIONED_IN"}),
+            ("HX-31", "V-204", {"type": "FEEDS"}),
+        ]
+        for n_id, data in default_nodes:
+            if not self.memory_graph.has_node(n_id):
+                self.memory_graph.add_node(n_id, **data)
+        for u, v, data in default_edges:
+            if not self.memory_graph.has_edge(u, v):
+                self.memory_graph.add_edge(u, v, **data)
 
     def close(self):
         if self.driver:
@@ -201,14 +229,46 @@ class Neo4jClient:
         return self._get_memory_neighborhood(entity_id, depth)
 
     def _get_memory_neighborhood(self, entity_id: str, depth: int) -> Dict[str, Any]:
-        if not entity_id or self.memory_graph is None or not self.memory_graph.has_node(entity_id):
-            return {
-                "nodes": [],
-                "edges": []
-            }
+        if self.memory_graph is None:
+            return {"nodes": [], "edges": []}
 
-        visited_nodes = {entity_id}
-        current_layer = {entity_id}
+        # Return full graph if entity_id is empty or ALL
+        if not entity_id or entity_id.upper() == "ALL":
+            nodes = []
+            for n_id, data in self.memory_graph.nodes(data=True):
+                nodes.append({
+                    "id": str(n_id),
+                    "label": data.get("label", "Equipment"),
+                    "properties": data.get("properties", {"name": str(n_id)})
+                })
+            edges = []
+            for u, v, k, data in self.memory_graph.edges(keys=True, data=True):
+                edges.append({
+                    "id": f"edge-{u}-{v}-{k}",
+                    "source": str(u),
+                    "target": str(v),
+                    "type": data.get("type", "CONNECTED_TO")
+                })
+            return {"nodes": nodes, "edges": edges}
+
+        # Match node case-insensitively or by property
+        target_node = None
+        target_lower = entity_id.lower().strip()
+        for node_id in self.memory_graph.nodes():
+            if str(node_id).lower() == target_lower:
+                target_node = node_id
+                break
+            n_data = self.memory_graph.nodes[node_id]
+            props = n_data.get("properties", {})
+            if any(str(v).lower() == target_lower for v in props.values() if isinstance(v, (str, int))):
+                target_node = node_id
+                break
+
+        if target_node is None:
+            return {"nodes": [], "edges": []}
+
+        visited_nodes = {target_node}
+        current_layer = {target_node}
 
         for _ in range(depth):
             next_layer = set()
@@ -227,7 +287,7 @@ class Neo4jClient:
             nodes.append({
                 "id": str(n_id),
                 "label": n_data.get("label", "Equipment"),
-                "properties": n_data.get("properties", {"name": n_id})
+                "properties": n_data.get("properties", {"name": str(n_id)})
             })
 
         edges = []
