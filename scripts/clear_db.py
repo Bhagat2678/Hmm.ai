@@ -1,5 +1,5 @@
 """
-Mhmm.ai Database & Upload Cleanup Utility
+Bedrock Database & Upload Cleanup Utility
 Clears PostgreSQL (or SQLite) operational tables while preserving Alembic migration history.
 Also purges temporary uploaded files.
 """

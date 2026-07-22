@@ -141,7 +141,7 @@ function DashboardPage() {
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
               <span className="live-dot h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
-              Live · Mhmm.ai Operations Overview
+              Live · Bedrock Operations Overview
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Industrial Knowledge Intelligence

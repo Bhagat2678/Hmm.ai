@@ -1,5 +1,5 @@
 """
-Constants for the AI/ML module of Mhmm.ai platform.
+Constants for the AI/ML module of Bedrock platform.
 """
 
 from typing import List, Dict, Any

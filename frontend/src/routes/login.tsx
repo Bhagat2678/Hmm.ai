@@ -62,7 +62,7 @@ function LoginPage() {
             Industrial AI Operational Portal
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-            Mhmm.ai Workspace
+            Bedrock Workspace
           </h1>
           <p className="text-xs text-muted-foreground leading-relaxed">
             Ingest engineering documents, query equipment knowledge, and monitor predictive maintenance alerts.

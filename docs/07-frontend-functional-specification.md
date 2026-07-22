@@ -1,7 +1,7 @@
-# Mhmm.ai Frontend Functional Specification
+# Bedrock Frontend Functional Specification
 
 ## 1. Purpose
-The **Mhmm.ai Frontend Application** is the user-facing interface for the Industrial Knowledge Intelligence Platform. It provides a seamless, responsive, and intuitive experience for industrial operators, engineers, and safety managers to query knowledge, visualize equipment relationships, upload operational documents, and monitor AI-generated predictive failure alerts.
+The **Bedrock Frontend Application** is the user-facing interface for the Industrial Knowledge Intelligence Platform. It provides a seamless, responsive, and intuitive experience for industrial operators, engineers, and safety managers to query knowledge, visualize equipment relationships, upload operational documents, and monitor AI-generated predictive failure alerts.
 
 **Design Philosophy:**
 - **"Any Device" Accessibility:** Fully responsive design supporting mobile phones, tablets, and desktop workstations seamlessly (PWA-capable).

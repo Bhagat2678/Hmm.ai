@@ -43,7 +43,7 @@ export function BrandMark({ collapsed = false }: { collapsed?: boolean }) {
       {!collapsed && (
         <div className="min-w-0 leading-tight">
           <p className="font-bold tracking-tight text-primary text-base">
-            Mhmm<span className="text-foreground">.ai</span>
+            Bedrock
           </p>
           <p className="truncate text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
             Operations Platform
