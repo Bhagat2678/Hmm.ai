@@ -20,6 +20,8 @@ import {
   RefreshCw,
   Terminal,
   Activity,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -34,11 +36,11 @@ export const Route = createFileRoute("/query")({
   },
   head: () => ({
     meta: [
-      { title: "Knowledge Query - Mhmm.ai" },
+      { title: "Cosmic Intelligence — Mhmm.ai" },
       {
         name: "description",
         content:
-          "Ask Mhmm.ai natural-language questions about equipment, SOPs, and engineering knowledge with cited answers.",
+          "Ask Mhmm.ai Cosmic Intelligence natural-language questions about equipment, SOPs, and engineering knowledge with cited answers.",
       },
     ],
   }),
@@ -75,11 +77,12 @@ function QueryPage() {
   const navigate = useNavigate({ from: Route.fullPath });
   const [input, setInput] = useState(urlQuery || "");
   const { mutate: submitQuery, isPending } = useKnowledgeQuery();
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const [sessions, setSessions] = useState<ChatSession[]>([
     {
       id: "initial-session",
-      title: "Current Chat",
+      title: "Current Session",
       timestamp: new Date(),
       messages: [],
       citations: [],
@@ -96,7 +99,7 @@ function QueryPage() {
       setSessions([
         {
           id: crypto.randomUUID(),
-          title: "New Chat",
+          title: "New Session",
           timestamp: new Date(),
           messages: [],
           citations: [],
@@ -125,7 +128,7 @@ function QueryPage() {
     const newSessionId = crypto.randomUUID();
     const newSession: ChatSession = {
       id: newSessionId,
-      title: "New Chat",
+      title: "New Session",
       timestamp: new Date(),
       messages: [],
       citations: [],
@@ -209,15 +212,27 @@ function QueryPage() {
   const currentCitations = activeSession.citations;
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[250px_minmax(0,1fr)_300px] h-[calc(100vh-140px)] min-h-[600px]">
+    <div
+      className={cn(
+        "grid gap-4 h-[calc(100vh-140px)] min-h-[600px] transition-all duration-200 ease-in-out",
+        isExpanded
+          ? "grid-cols-1 lg:grid-cols-[minmax(0,1fr)_300px]"
+          : "grid-cols-1 lg:grid-cols-[250px_minmax(0,1fr)_300px]",
+      )}
+    >
       {/* Left Sidebar: Conversations History */}
-      <aside className="hidden lg:flex flex-col glass-panel rounded-3xl overflow-hidden">
+      <aside
+        className={cn(
+          "hidden lg:flex flex-col glass-panel rounded-3xl overflow-hidden transition-all duration-200 ease-in-out",
+          isExpanded && "!hidden",
+        )}
+      >
         <div className="flex items-center justify-between border-b border-border/50 px-4 py-3.5">
           <div className="flex items-center gap-2">
             <div className="grid h-7 w-7 place-items-center rounded-xl bg-primary/10">
               <MessageSquare className="h-3.5 w-3.5 text-primary" />
             </div>
-            <p className="text-xs font-bold text-foreground">Conversations</p>
+            <p className="text-xs font-bold text-foreground">Sessions</p>
           </div>
           <button
             onClick={createNewChat}
@@ -277,7 +292,7 @@ function QueryPage() {
               <Sparkles className="h-4 w-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-foreground">Cosmic Knowledge Assistant</h2>
+              <h2 className="text-sm font-bold text-foreground">Cosmic Intelligence Workspace</h2>
               <p className="text-[10px] font-bold text-muted-foreground inline-flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500 live-dot" />
                 Gemini 2.5 Flash · Groq RAG Engine
@@ -286,13 +301,33 @@ function QueryPage() {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setIsExpanded((prev) => !prev)}
+              className={cn(
+                "inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition-all cursor-pointer",
+                isExpanded
+                  ? "bg-primary text-white shadow-md shadow-primary/25 hover:brightness-110"
+                  : "glass-panel border border-primary/20 text-primary hover:bg-primary/10",
+              )}
+              title={isExpanded ? "Restore Normal View" : "Expand Workspace"}
+            >
+              {isExpanded ? (
+                <>
+                  <Minimize2 className="h-3.5 w-3.5" /> Restore
+                </>
+              ) : (
+                <>
+                  <Maximize2 className="h-3.5 w-3.5" /> Expand Workspace
+                </>
+              )}
+            </button>
+            <button
               onClick={() => {
                 setSessions((prev) =>
                   prev.map((s) => (s.id === activeSessionId ? { ...s, messages: [], citations: [] } : s)),
                 );
               }}
               className="p-2 rounded-xl text-muted-foreground hover:bg-red-100 hover:text-red-600 transition-colors cursor-pointer"
-              title="Clear active chat"
+              title="Clear active session"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -446,7 +481,7 @@ function EmptyState({ onSuggest, isPending }: { onSuggest: (s: string) => void; 
       <div className="grid h-16 w-16 place-items-center rounded-2xl bg-primary text-white shadow-xl shadow-primary/25">
         <Sparkles className="h-8 w-8" />
       </div>
-      <h3 className="mt-5 text-lg font-bold text-foreground">Cosmic Assistant v4.2</h3>
+      <h3 className="mt-5 text-lg font-bold text-foreground">Cosmic Intelligence</h3>
       <p className="mt-1.5 max-w-sm text-xs text-muted-foreground leading-relaxed">
         Ask natural-language questions about equipment, failure modes, or SOPs. Every claim is cited to source.
       </p>
@@ -496,7 +531,7 @@ function MessageBubble({
       </div>
       <div className="min-w-0 flex-1 space-y-2.5">
         <div className="flex items-center gap-2 text-[11px] font-semibold text-muted-foreground">
-          <span className="font-bold text-primary">Cosmic AI</span>
+          <span className="font-bold text-primary">Cosmic Intelligence</span>
           {message.confidence != null && !isStreaming && (
             <span>· Retained 92% context · Cited {message.citations?.length || 3} sources</span>
           )}

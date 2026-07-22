@@ -26,7 +26,7 @@ type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { title: "Dashboard", to: "/", icon: LayoutDashboard, exact: true },
-  { title: "Chat AI", to: "/query", icon: Search },
+  { title: "Cosmic Intelligence", to: "/query", icon: Search },
   { title: "Knowledge Graph", to: "/graph", icon: Share2 },
   { title: "Document Explorer", to: "/documents", icon: FileText },
   { title: "Ingestion", to: "/upload", icon: Upload },
